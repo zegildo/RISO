@@ -9,6 +9,7 @@ public class URIEdge extends URIGeral {
 	
 	public URIEdge(String edge) {
 		super(ObjetosURIConceptNet.ID, edge);
+		setEdge(edge);
 	}
 
 	public String getEdge() {

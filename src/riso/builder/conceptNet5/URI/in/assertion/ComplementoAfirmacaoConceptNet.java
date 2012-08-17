@@ -1,5 +1,6 @@
 package riso.builder.conceptNet5.URI.in.assertion;
 
+import riso.builder.conceptNet5.URI.in.Constantes;
 import riso.builder.conceptNet5.URI.in.URIGeral;
 import riso.builder.conceptNet5.URI.in.interfaces.Complementavel;
 
@@ -45,8 +46,8 @@ public class ComplementoAfirmacaoConceptNet implements Complementavel{
 	}
 
 	public String getComplemento() {
-		return "["+getRelacao().getTipoElemento().getString()+"/"+getRelacao().getComplemento() + ","+
-	getInicio().getTipoElemento().getString()+"/"+getInicio().getComplemento()+","+
-				getFim().getTipoElemento().getString()+"/"+getFim().getComplemento()+"]";
+		return Constantes.BARRA+"["+getRelacao().getTipoEComplemento()+ ","+
+	getInicio().getTipoEComplemento()+","+
+				getFim().getTipoEComplemento()+"]";
 	}
 }

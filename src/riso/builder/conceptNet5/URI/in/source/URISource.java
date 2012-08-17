@@ -9,6 +9,7 @@ public class URISource extends URIGeral{
 	
 	public URISource(ComplementoSourceConceptNet complemento){
 		super(ObjetosURIConceptNet.FONTE, complemento.getComplemento());
+		setComplemento(complemento);
 		
 	}
 

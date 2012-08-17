@@ -1,9 +1,16 @@
 package riso.builder.conceptNet5.URI.in;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import riso.builder.conceptNet5.URI.in.actions.ComplementoRestricoes;
+import riso.builder.conceptNet5.URI.in.actions.association.ComponenteAssociacao;
+import riso.builder.conceptNet5.URI.in.actions.association.ComponenteAssociationConcept;
+import riso.builder.conceptNet5.URI.in.actions.association.ComponenteAssociationList;
+import riso.builder.conceptNet5.URI.in.actions.association.URIAssociationConcept;
+import riso.builder.conceptNet5.URI.in.actions.association.URIAssociationList;
 import riso.builder.conceptNet5.URI.in.actions.search.Search;
 import riso.builder.conceptNet5.URI.in.assertion.ComplementoAfirmacaoConceptNet;
 import riso.builder.conceptNet5.URI.in.assertion.URIAfirmacoes;
@@ -26,20 +33,21 @@ public class Main {
 
 	public static void main(String[] args){
 		
-		/*
-		 * SEARCH
-		 */
+		
 		ComplementoRelacaoConceptNet relacao = new ComplementoRelacaoConceptNet(Relacao.PART_OF);
 		URIGeral relac = new URIRelacao(relacao);
 		ComplementoConceitoConceptNet conc = new ComplementoConceitoConceptNet("car");
 		URIGeral conceito = new URIConceito(conc);
-		
+		//Restricoes
 		Map<String, String> restricoes = new HashMap<String, String>();
 		restricoes.put(Constantes.SEARCH_LIMIT, "5");
 		restricoes.put(Constantes.SEARCH_OFFSET, "3");
 		restricoes.put(Constantes.SEARCH_REL,relac.getTipoEComplemento());
 		restricoes.put(Constantes.SEARCH_END,conceito.getTipoEComplemento());
 
+		/*
+		 * SEARCH
+		 */
 		ComplementoRestricoes complemento = new ComplementoRestricoes(restricoes);
 		Search search = new Search(complemento);
 		System.out.println(search.toString());
@@ -74,18 +82,18 @@ public class Main {
 		/*
 		 * Conceitos 
 		 */
-		ComplementoConceitoConceptNet complementoCCN = new ComplementoConceitoConceptNet("big",MorfologiaConceptNet.VERBO, IdiomasConceptNet.INGLES);
+		ComplementoConceitoConceptNet complementoCCN = new ComplementoConceitoConceptNet("big",MorfologiaConceptNet.ISENTA, IdiomasConceptNet.INGLES);
 		URIConceito con = new URIConceito(complementoCCN);
 		System.out.println(con);
 		
 		/*
 		 * Afirmacoes 
 		 */
-		ComplementoRelacaoConceptNet r = new ComplementoRelacaoConceptNet(Relacao.IS_A);
+		ComplementoRelacaoConceptNet r = new ComplementoRelacaoConceptNet(Relacao.HAS_PROPERTY);
 		URIGeral re = new URIRelacao(r);
-		ComplementoConceitoConceptNet conc1 = new ComplementoConceitoConceptNet("boy", MorfologiaConceptNet.ISENTA, IdiomasConceptNet.INGLES);
+		ComplementoConceitoConceptNet conc1 = new ComplementoConceitoConceptNet("big");
 		URIGeral c = new URIConceito(conc1);
-		ComplementoConceitoConceptNet conc2 = new ComplementoConceitoConceptNet("male", MorfologiaConceptNet.ISENTA, IdiomasConceptNet.INGLES);
+		ComplementoConceitoConceptNet conc2 = new ComplementoConceitoConceptNet("large");
 		URIGeral con2 = new URIConceito(conc2);
 		URIGeral afirm[] = {re,c,con2};
 		ComplementoAfirmacaoConceptNet afirmacao = new ComplementoAfirmacaoConceptNet(afirm);
@@ -93,6 +101,22 @@ public class Main {
 		URIGeral af = new URIAfirmacoes(afirmacao);
 		System.out.println(af.toString());
 
+		/*
+		 *Associacoes 
+		 */
+		//Por conceito
+		ComponenteAssociationConcept assCon = new ComponenteAssociationConcept(con,complemento);
+		URIGeral ac = new URIAssociationConcept(assCon);
+		System.out.println(ac.toString());
 		
+		//Por Lista
+		ComponenteAssociacao comp1 =  new ComponenteAssociacao("boy");
+		ComponenteAssociacao comp2 = new ComponenteAssociacao("girl","-1");
+		List<ComponenteAssociacao> listComp = new ArrayList<ComponenteAssociacao>();
+		listComp.add(comp1);
+		listComp.add(comp2);
+		ComponenteAssociationList asslist = new ComponenteAssociationList(listComp, complemento);
+		URIGeral uriList = new URIAssociationList(asslist);
+		System.out.println(uriList.toString());
 	}
 }

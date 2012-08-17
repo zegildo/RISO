@@ -9,6 +9,7 @@ public class URIAssociationList extends URIGeral{
 
 	public URIAssociationList(ComponenteAssociationList lista) {
 		super(ObjetosURIConceptNet.ASSOC, lista.getComplemento());
+		setLista(lista);
 	}
 
 	public ComponenteAssociationList getLista() {

@@ -5,24 +5,26 @@ import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.data.DictionaryElementType;
-import net.didion.jwnl.data.IndexWord;
-import net.didion.jwnl.data.IndexWordSet;
-import net.didion.jwnl.data.POS;
-import net.didion.jwnl.data.Pointer;
-import net.didion.jwnl.data.PointerTarget;
-import net.didion.jwnl.data.PointerType;
-import net.didion.jwnl.data.Synset;
-import net.didion.jwnl.data.Word;
-import net.didion.jwnl.dictionary.DatabaseBackedDictionary;
+import riso.builder.wordnet.JWNL;
+import riso.builder.wordnet.JWNLException;
+import riso.builder.wordnet.data.DictionaryElementType;
+import riso.builder.wordnet.data.IndexWord;
+import riso.builder.wordnet.data.IndexWordSet;
+import riso.builder.wordnet.data.POS;
+import riso.builder.wordnet.data.Pointer;
+import riso.builder.wordnet.data.PointerTarget;
+import riso.builder.wordnet.data.PointerType;
+import riso.builder.wordnet.data.Synset;
+import riso.builder.wordnet.data.Word;
+import riso.builder.wordnet.dictionary.DatabaseBackedDictionary;
 
-public class JWNL {
+
+public class JWNLExec {
 	
 	public static void main(String args[]) throws FileNotFoundException, JWNLException{
 		
 		//esta linha contem o xml ou o conjunto de configuracoes utilizado para carregar as propriedades escolhidas...
-		net.didion.jwnl.JWNL.initialize(new FileInputStream("WordNet/database_properties.xml"));
+		JWNL.initialize(new FileInputStream("src/config/wordnet/database_properties.xml"));
 		
 		/*
 		 * TODO OK.

@@ -1,5 +1,6 @@
 package riso.builder.conceptNet5.URI.in.source;
 
+import riso.builder.conceptNet5.URI.in.Constantes;
 import riso.builder.conceptNet5.URI.in.interfaces.Complementavel;
 import riso.builder.conceptNet5.URI.in.types.Sources;
 
@@ -35,7 +36,7 @@ public class ComplementoSourceConceptNet implements Complementavel {
 	}
 
 	public String getComplemento() {
-		return "/"+getSource().getString()+getComplementacao();
+		return Constantes.BARRA+getSource().getString()+getComplementacao();
 	}
 
 	

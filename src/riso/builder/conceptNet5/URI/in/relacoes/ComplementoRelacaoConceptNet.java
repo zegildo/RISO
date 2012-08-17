@@ -1,5 +1,6 @@
 package riso.builder.conceptNet5.URI.in.relacoes;
 
+import riso.builder.conceptNet5.URI.in.Constantes;
 import riso.builder.conceptNet5.URI.in.interfaces.Complementavel;
 import riso.builder.conceptNet5.URI.in.types.Relacao;
 
@@ -21,6 +22,6 @@ public class ComplementoRelacaoConceptNet implements Complementavel {
 	}
 
 	public String getComplemento() {
-		return "/"+getRelacao().getString();
+		return Constantes.BARRA+getRelacao().getString()+Constantes.BARRA;
 	}
 }

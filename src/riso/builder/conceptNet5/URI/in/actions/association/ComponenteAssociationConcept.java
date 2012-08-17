@@ -1,32 +1,35 @@
 package riso.builder.conceptNet5.URI.in.actions.association;
 
-import riso.builder.conceptNet5.URI.in.URIGeral;
 import riso.builder.conceptNet5.URI.in.actions.ComplementoRestricoes;
+import riso.builder.conceptNet5.URI.in.concept.URIConceito;
 import riso.builder.conceptNet5.URI.in.interfaces.Complementavel;
 
 public class ComponenteAssociationConcept extends Association implements Complementavel {
 
 	
-	private URIGeral uri;
+	private URIConceito uri;
 	
-	public ComponenteAssociationConcept(URIGeral uri, ComplementoRestricoes restricoes){
+	public ComponenteAssociationConcept(URIConceito uri, ComplementoRestricoes restricoes){
 		setUri(uri);
-		super.setRestricoes(restricoes);
+		setIdioma(getUri().getComplementoCCN().getIdioma());
+		setRestricoes(restricoes);
 	}
-	public ComponenteAssociationConcept(URIGeral uri){
+	public ComponenteAssociationConcept(URIConceito uri){
 		setUri(uri);
+		setIdioma(getUri().getComplementoCCN().getIdioma());
+
 	}
 	
-	public URIGeral getUri() {
+	public URIConceito getUri() {
 		return uri;
 	}
 
-	public void setUri(URIGeral uri) {
+	public void setUri(URIConceito uri) {
 		this.uri = uri;
 	}
 
 	public String getComplemento() {
-		String compl = getUri().getTipoEComplemento()+getIdioma().getString();
+		String compl = getUri().getTipoEComplemento();
 		if(getRestricoes() == null){
 			return compl;
 		}

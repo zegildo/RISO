@@ -19,6 +19,7 @@ public class URIConceito extends URIGeral {
 
 	public URIConceito(ComplementoConceitoConceptNet complemento){
 		super(ObjetosURIConceptNet.CONCEITOS, IdiomasConceptNet.INGLES,complemento.getComplemento());
+		setComplementoCCN(complemento);
 	}
 	
 	public ComplementoConceitoConceptNet getComplementoCCN() {
@@ -27,11 +28,6 @@ public class URIConceito extends URIGeral {
 
 	public void setComplementoCCN(ComplementoConceitoConceptNet complementoCCN) {
 		this.complementoCCN = complementoCCN;
-	}
-
-	public static void main(String args[]){
-		
-		
 	}
 	
 }

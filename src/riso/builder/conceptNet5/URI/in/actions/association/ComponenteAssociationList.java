@@ -5,6 +5,7 @@ import java.util.List;
 import riso.builder.conceptNet5.URI.in.Constantes;
 import riso.builder.conceptNet5.URI.in.actions.ComplementoRestricoes;
 import riso.builder.conceptNet5.URI.in.interfaces.Complementavel;
+import riso.builder.conceptNet5.URI.in.types.IdiomasConceptNet;
 
 public class ComponenteAssociationList extends Association implements Complementavel {
 
@@ -14,13 +15,21 @@ public class ComponenteAssociationList extends Association implements Complement
 	 */
 	private List<ComponenteAssociacao> componentes;
 		
+	public ComponenteAssociationList(List<ComponenteAssociacao> componentes, IdiomasConceptNet idioma, ComplementoRestricoes restricoes){
+		setComponentes(componentes);
+		setRestricoes(restricoes);
+		setIdioma(idioma);
+	}
+	
 	public ComponenteAssociationList(List<ComponenteAssociacao> componentes, ComplementoRestricoes restricoes){
 		setComponentes(componentes);
-		super.setRestricoes(restricoes);
+		setRestricoes(restricoes);
+		setIdioma(IdiomasConceptNet.INGLES);
 	}
 	
 	public ComponenteAssociationList(List<ComponenteAssociacao> componentes){
 		setComponentes(componentes);
+		setIdioma(IdiomasConceptNet.INGLES);
 	}
 
 	public List<ComponenteAssociacao> getComponentes() {
@@ -33,14 +42,14 @@ public class ComponenteAssociationList extends Association implements Complement
 
 
 	public String getComplemento() {
-		String list = Constantes.BARRA+Constantes.ASSOC_LIST+Constantes.BARRA+getIdioma().getString();
+		String list = Constantes.BARRA+Constantes.ASSOC_LIST+Constantes.BARRA+getIdioma().getString()+Constantes.BARRA;
 		for (ComponenteAssociacao componente : getComponentes()) {
 			list+= componente.toString()+",";
 		}
 		list = list.substring(0, list.length()-1);
 		
-		if(super.getRestricoes()!= null){
-			list+=super.getRestricoes().getComplemento();
+		if(getRestricoes()!= null){
+			list+=getRestricoes().getComplemento();
 		}
 		return list;
 	}

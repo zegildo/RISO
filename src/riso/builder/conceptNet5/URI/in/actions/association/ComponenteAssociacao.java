@@ -5,9 +5,10 @@ import riso.builder.conceptNet5.URI.in.Constantes;
 public class ComponenteAssociacao {
 
 	private String termo;
-	private int peso;
+	private String peso;
 
-	public ComponenteAssociacao(String termo, int peso){
+
+	public ComponenteAssociacao(String termo, String peso){
 		setTermo(termo);
 		setPeso(peso);
 	}
@@ -24,15 +25,18 @@ public class ComponenteAssociacao {
 		this.termo = termo;
 	}
 
-	public int getPeso() {
+	public String getPeso() {
 		return peso;
 	}
 
-	public void setPeso(int peso) {
+	public void setPeso(String peso) {
 		this.peso = peso;
 	}
 	
 	public String getPesoConf(){
+		if(getPeso() == null){
+			return"";
+		}
 		return Constantes.ARROBA+getPeso();
 	}
 	

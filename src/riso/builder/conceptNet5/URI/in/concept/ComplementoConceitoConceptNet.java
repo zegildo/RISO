@@ -1,5 +1,6 @@
 package riso.builder.conceptNet5.URI.in.concept;
 
+import riso.builder.conceptNet5.URI.in.Constantes;
 import riso.builder.conceptNet5.URI.in.interfaces.Complementavel;
 import riso.builder.conceptNet5.URI.in.types.IdiomasConceptNet;
 import riso.builder.conceptNet5.URI.in.types.MorfologiaConceptNet;
@@ -52,6 +53,6 @@ public class ComplementoConceitoConceptNet implements Complementavel {
 	}
 
 	public String getComplemento() {
-		return "/"+getIdioma().getString()+"/"+getPalavra()+"/"+getMorfologia().getString();
+		return Constantes.BARRA+getIdioma().getString()+Constantes.BARRA+getPalavra()+Constantes.BARRA+getMorfologia().getString();
 	}
 }

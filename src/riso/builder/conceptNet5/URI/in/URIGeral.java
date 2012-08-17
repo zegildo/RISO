@@ -60,7 +60,7 @@ public class URIGeral {
 	}
 
 	public String getTipoEComplemento(){
-		return "/"+getTipoElemento().getString()+getComplemento();
+		return Constantes.BARRA+getTipoElemento().getString()+getComplemento();
 	}
 
 	@Override
