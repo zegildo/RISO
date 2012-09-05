@@ -118,5 +118,12 @@ public class Main {
 		ComponenteAssociationList asslist = new ComponenteAssociationList(listComp, complemento);
 		URIGeral uriList = new URIAssociationList(asslist);
 		System.out.println(uriList.toString());
+		
+		/*
+		 *Testando jaguar... 	
+		 */
+		ComplementoConceitoConceptNet complCCN = new ComplementoConceitoConceptNet("jaguar");
+		URIConceito conceitojaguar = new URIConceito(complCCN);
+		System.out.println(conceitojaguar);
 	}
 }

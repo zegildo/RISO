@@ -28,6 +28,8 @@ public class Constantes {
 	public static final String RELACAO_TRANSLATION_OF = "TranslationOf";
 	public static final String RELACAO_AT_LOCATION = "AtLocation";
 	public static final String RELACAO_DERIVEDED_FROM = "DerivedFrom";
+	public static final String RELACAO_MEMBER_OF = "MemberOf";
+
 
 	public static final String DATA_WORDNET = "wordnet";
 	public static final String DATA_DBPEDIA = "dbpedia";

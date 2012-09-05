@@ -4,6 +4,24 @@ import java.util.List;
 
 public class ArestaConceptNet {
 
+	private String endLemmas;
+	private String startLemmas;
+	
+	public String getEndLemmas() {
+		return endLemmas;
+	}
+
+	public void setEndLemma(String endLemmas) {
+		this.endLemmas = endLemmas;
+	}
+
+	public String getStartLemmas() {
+		return startLemmas;
+	}
+
+	public void setStartLemma(String startLemmas) {
+		this.startLemmas = startLemmas;
+	}
 
 	/**
 	 * Identificador unico para uma aresta a qual contem um hash SHA-1 da informacao que o torna unico
@@ -192,6 +210,31 @@ public class ArestaConceptNet {
 				+ ", dataset=" + dataset + ", context=" + context
 				+ ", features=" + features + ", surfaceText=" + surfaceText
 				+ ", score=" + score + ", timestamp=" + timestamp + "]";
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ArestaConceptNet other = (ArestaConceptNet) obj;
+		if (uri == null) {
+			if (other.uri != null)
+				return false;
+		} else if (!uri.equals(other.uri))
+			return false;
+		return true;
 	}
 
 }

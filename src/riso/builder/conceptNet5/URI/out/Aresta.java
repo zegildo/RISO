@@ -1,15 +1,36 @@
 package riso.builder.conceptNet5.URI.out;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class Aresta {
 
 	private int numFound;
-	private List<ArestaConceptNet> edges = new ArrayList<ArestaConceptNet>();
+	private Set<ArestaConceptNet> edges = new HashSet<ArestaConceptNet>();
 	private double maxScore;
+	private int percorridos;
+	private boolean possuePoll;
 	
+	public int getPercorridos() {
+		return percorridos;
+	}
+	
+	public void setPercorridos(int percorridos) {
+		this.percorridos = getPercorridos() + percorridos;
+	}
+	
+	public boolean isPossuePoll() {
+		
+		if((getNumFound() - getPercorridos()) >0){
+			return true;
+		}
+		return false;
+	}
+	
+	public void setPossuePoll(boolean possuePoll) {
+		this.possuePoll = possuePoll;
+	}
 	public double getMaxScore() {
 		return maxScore;
 	}
@@ -22,10 +43,10 @@ public class Aresta {
 	public void setNumFound(int numFound) {
 		this.numFound = numFound;
 	}
-	public List<ArestaConceptNet> getEdges() {
+	public Set<ArestaConceptNet> getEdges() {
 		return edges;
 	}
-	public void setEdges(List<ArestaConceptNet> edges) {
+	public void setEdges(Set<ArestaConceptNet> edges) {
 		this.edges = edges;
 	}
 	@Override

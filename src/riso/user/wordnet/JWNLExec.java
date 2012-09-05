@@ -42,12 +42,12 @@ public class JWNLExec {
 		 *  No influencia.
 		 */
 		
-		IndexWordSet indexWordSet = DatabaseBackedDictionary.getInstance().lookupAllIndexWords("greece");
-		System.out.println(" == Informa�›es de INDEXWORDSET ==");
+		IndexWordSet indexWordSet = DatabaseBackedDictionary.getInstance().lookupAllIndexWords("automobile");
+		System.out.println(" == Informacoes de INDEXWORDSET ==");
 		System.out.println();
 		IndexWord[] indWord = indexWordSet.getIndexWordArray();
 		
-		System.out.println("As possibilidades morfol—gicas da palavra...");
+		System.out.println("As possibilidades morfologicas da palavra...");
 		
 		for (IndexWord iW : indWord) {
 			System.out.println(iW.getPOS());
@@ -163,6 +163,19 @@ public class JWNLExec {
 		
 		
 		System.out.println("> > syn.getPointers(PointerType.HYPERNYM)[0]: "+syn.getPointers(PointerType.HYPONYM).length);
+		
+		System.out.println("HIPERONIMOS - syn.getPointers(PointerType.HYPERNYM)");
+		
+		Pointer[] pontos = syn.getPointers(PointerType.HYPERNYM);
+		while(pontos.length > 0){
+			Pointer ponto = pontos[0];
+			System.out.println("Target: "+ponto.getTargetSynset().getGloss());
+			System.out.println("source: "+ponto.getSource());
+			System.out.println("words: "+ponto.getTargetSynset().getWords());
+
+			pontos = ponto.getTargetSynset().getPointers(PointerType.HYPERNYM);
+		}
+		
 		System.out.println("> > syn.getPOS(): "+syn.getPOS());
 		System.out.println("> > syn.getTargets(): "+syn.getTargets().length);
 		
@@ -170,7 +183,12 @@ public class JWNLExec {
 		for (PointerTarget ptarget : ptrgt) {
 			System.out.println(ptarget.toString());
 		}*/
+		
+		System.out.println("HIPERONIMOS - syn.getTargets(PointerType.HYPERNYM)");
+				
 		System.out.println("> > syn.getTargets(PointerType.HYPERNYM): "+syn.getTargets(PointerType.HYPERNYM));
+		
+		
 		System.out.println("> > syn.getType(): "+syn.getType());
 		System.out.println(">  > syn.getVerbFrameFlags(): "+syn.getVerbFrameFlags());		
 		//System.out.println("> > syn.getVerbFrameIndicies(): "+syn.getVerbFrameIndicies());
