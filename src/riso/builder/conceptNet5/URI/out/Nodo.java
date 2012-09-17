@@ -1,80 +1,25 @@
 package riso.builder.conceptNet5.URI.out;
 
-import java.util.List;
+
 
 public class Nodo {
 
-	private List<Nodo> pai;
-	private List<Nodo> filho;
-	private List<String> sinonimos;
-	private String frase;
-	
-
-	private String relacaoFilho;
-	private String relacaoPai;
+	private Estrutura estrutura;
 	private String conceito;
-	
+
 	
 	public Nodo(String conceito){
 		setConceito(conceito);
+		setEstrutura(new Estrutura());
 	}
 	
-	public String getFrase() {
-		return frase;
+	public Estrutura getEstrutura() {
+		return estrutura;
 	}
 
-	public void setFrase(String frase) {
-		this.frase = frase;
+	public void setEstrutura(Estrutura estrutura) {
+		this.estrutura = estrutura;
 	}
-
-
-	public List<String> getSinonimos() {
-		return sinonimos;
-	}
-
-	public void setSinonimos(List<String> sinonimos) {
-		this.sinonimos = sinonimos;
-	}
-	
-	public List<Nodo> getPai() {
-		return pai;
-	}
-
-
-	public void setPai(List<Nodo> pai) {
-		this.pai = pai;
-	}
-
-
-	public List<Nodo> getFilho() {
-		return filho;
-	}
-
-
-	public void setFilho(List<Nodo> filho) {
-		this.filho = filho;
-	}
-
-
-	public String getRelacaoFilho() {
-		return relacaoFilho;
-	}
-
-
-	public void setRelacaoFilho(String relacaoFilho) {
-		this.relacaoFilho = relacaoFilho;
-	}
-
-
-	public String getRelacaoPai() {
-		return relacaoPai;
-	}
-
-
-	public void setRelacaoPai(String relacaoPai) {
-		this.relacaoPai = relacaoPai;
-	}
-
 
 	public String getConceito() {
 		return conceito;
@@ -84,6 +29,31 @@ public class Nodo {
 	public void setConceito(String conceito) {
 		this.conceito = conceito;
 	}
-	
-	
+
+//	public void imprimeGenealogia(Nodo no){
+//
+//		Nodo noDaVez = no;
+//		String ESPACO ="";
+//		final int ZERO = Constantes.ZERO;
+//		while(noDaVez != null){
+//			String impressao = ESPACO+noDaVez.getConceito()+" ";
+//			String sinonimos = "{";
+//			if(!noDaVez.getSinonimos().isEmpty()){
+//
+//				for (String str : noDaVez.getSinonimos()) {
+//					sinonimos+=str+",";
+//				}
+//				sinonimos=sinonimos.substring(0, sinonimos.length()-1);
+//
+//			}
+//			sinonimos+="}";
+//			impressao+=sinonimos;
+//			System.out.println(impressao);
+//
+//			ESPACO+=" ";
+//			noDaVez = ((noDaVez.getPai() == null) || (noDaVez.getPai().size() == ZERO))?null:noDaVez.getPai().get(ZERO);
+//		}
+//	}
+
+
 }

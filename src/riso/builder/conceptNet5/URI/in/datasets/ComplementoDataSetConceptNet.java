@@ -1,6 +1,6 @@
 package riso.builder.conceptNet5.URI.in.datasets;
 
-import riso.builder.conceptNet5.URI.in.Constantes;
+import riso.builder.conceptNet5.URI.Constantes;
 import riso.builder.conceptNet5.URI.in.interfaces.Complementavel;
 import riso.builder.conceptNet5.URI.in.types.DataSets;
 

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import riso.builder.conceptNet5.URI.Constantes;
 import riso.builder.conceptNet5.URI.in.actions.ComplementoRestricoes;
 import riso.builder.conceptNet5.URI.in.actions.association.ComponenteAssociacao;
 import riso.builder.conceptNet5.URI.in.actions.association.ComponenteAssociationConcept;

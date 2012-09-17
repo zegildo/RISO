@@ -1,6 +1,6 @@
 package riso.builder.conceptNet5.URI.in.actions.association;
 
-import riso.builder.conceptNet5.URI.in.Constantes;
+import riso.builder.conceptNet5.URI.Constantes;
 
 public class ComponenteAssociacao {
 

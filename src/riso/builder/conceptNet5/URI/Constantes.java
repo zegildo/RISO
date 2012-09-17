@@ -1,4 +1,9 @@
-package riso.builder.conceptNet5.URI.in;
+package riso.builder.conceptNet5.URI;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Constantes {
 
 	public static final String BARRA = "/";
@@ -13,6 +18,9 @@ public class Constantes {
 	public static final String TIPO_CONTRIBUICAO = "s";
 	public static final String SEARCH = "search";
 	public static final String ASSOC = "assoc";
+	public static final String LIMIT = "limit=";
+	public static final String OFFSET = "&offset=";
+
 
 	
 	public static final String IDIOMA_INGLES = "en";
@@ -29,8 +37,44 @@ public class Constantes {
 	public static final String RELACAO_AT_LOCATION = "AtLocation";
 	public static final String RELACAO_DERIVEDED_FROM = "DerivedFrom";
 	public static final String RELACAO_MEMBER_OF = "MemberOf";
+	public static final String RELACAO_CREATED_BY = "CreatedBy";
+	public static final String RELACAO_CAPABLE_OF = "CapableOf";
+	public static final String RELACAO_USED_FOR = "UsedFor";
+	public static final String RELACAO_HAS_A = "HasA";
+	public static final String RELACAO_DEFINED_AS="DefinedAs";
+	public static final String RELACAO_SILIMAR_SIZE= "SimilarSize";
+	public static final String RELACAO_NOT_IS_A = "NotIsA";
+	public static final String RELACAO_NOT_DESIRES= "NotDesires";
+	public static final String RELACAO_RELATED_TO = "RelatedTo";
+	public static final String RELACAO_RECEIVES_ACTION = "ReceivesAction";
+	public static final String RELACAO_MOTIVATED_BY_GOAL = "MotivatedByGoal";
+	public static final String RELACAO_LOCATED_NEAR = "LocatedNear";
+	public static final String RELACAO_CONCEPTUALLY_RELATED_TO = "ConceptuallyRelatedTo";
+	public static final String RELACAO_SYNONYM = "Synonym";
+	//Novas relacoes - relacoes inversas criadas para compor a tabela de relacoes sem‰ntias
+	public static final String RELACAO_COMPOUND_OF = "CompoundOf";
+	public static final String RELACAO_HAS_MEMBERS = "HasMembers";
+	public static final String RELACAO_CAN_BE = "CanBe";
+	public static final String RELACAO_IS_A_PROPERTY_OF = "IsAProperty";
+	public static final String RELACAO_BELONGS_TO = "BelogsTo";
+	public static final String RELACAO_CLASS_OF = "ClassOf";
+	public static final String RELACAO_SOURCE_OF = "SourceOf";
 
-
+	public static final Map<String, String> RELACOES_SEMANTICAS;
+    static {
+        Map<String, String> relacoesSemanticas = new HashMap<String, String>();
+        relacoesSemanticas.put(RELACAO_HAS_PROPERTY, RELACAO_IS_A_PROPERTY_OF);
+        relacoesSemanticas.put(RELACAO_INSTANCE_OF,RELACAO_CLASS_OF);
+        relacoesSemanticas.put(RELACAO_DERIVEDED_FROM, RELACAO_SOURCE_OF);
+        relacoesSemanticas.put(RELACAO_SYNONYM, RELACAO_SYNONYM);
+        relacoesSemanticas.put(RELACAO_RELATED_TO, RELACAO_RELATED_TO);
+        relacoesSemanticas.put(RELACAO_HAS_A, RELACAO_BELONGS_TO);
+        relacoesSemanticas.put(RELACAO_PART_OF, RELACAO_COMPOUND_OF);
+        relacoesSemanticas.put(RELACAO_MEMBER_OF, RELACAO_HAS_MEMBERS);
+        relacoesSemanticas.put(RELACAO_IS_A, RELACAO_CAN_BE);
+        RELACOES_SEMANTICAS = Collections.unmodifiableMap(relacoesSemanticas);
+    }
+		
 	public static final String DATA_WORDNET = "wordnet";
 	public static final String DATA_DBPEDIA = "dbpedia";
 	public static final String DATA_WIKTIONARY = "wiktionary";
@@ -80,6 +124,8 @@ public class Constantes {
     
     public static final String ARROBA = "@";
 
-
+    public static final int ZERO = 0;
+    
+    
 
 }

@@ -1,5 +1,6 @@
 package riso.builder.conceptNet5.URI.in;
 
+import riso.builder.conceptNet5.URI.Constantes;
 import riso.builder.conceptNet5.URI.in.types.IdiomasConceptNet;
 import riso.builder.conceptNet5.URI.in.types.ObjetosURIConceptNet;
 

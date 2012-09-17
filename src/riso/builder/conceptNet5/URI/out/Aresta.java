@@ -9,28 +9,17 @@ public class Aresta {
 	private int numFound;
 	private Set<ArestaConceptNet> edges = new HashSet<ArestaConceptNet>();
 	private double maxScore;
-	private int percorridos;
-	private boolean possuePoll;
-	
-	public int getPercorridos() {
-		return percorridos;
+
+	public void addEdge(ArestaConceptNet aresta){
+
+		getEdges().add(aresta);
 	}
-	
-	public void setPercorridos(int percorridos) {
-		this.percorridos = getPercorridos() + percorridos;
+
+	public void addSetEdge(Set<ArestaConceptNet> edges){
+
+		getEdges().addAll(edges);
 	}
-	
-	public boolean isPossuePoll() {
-		
-		if((getNumFound() - getPercorridos()) >0){
-			return true;
-		}
-		return false;
-	}
-	
-	public void setPossuePoll(boolean possuePoll) {
-		this.possuePoll = possuePoll;
-	}
+
 	public double getMaxScore() {
 		return maxScore;
 	}
@@ -40,6 +29,7 @@ public class Aresta {
 	public int getNumFound() {
 		return numFound;
 	}
+	
 	public void setNumFound(int numFound) {
 		this.numFound = numFound;
 	}
@@ -53,5 +43,5 @@ public class Aresta {
 	public String toString() {
 		return "Aresta [numFound=" + numFound + ", edges=" + edges + "]";
 	}
-	
+
 }

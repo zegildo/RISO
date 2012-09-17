@@ -1,13 +1,9 @@
 package riso.builder.conceptNet5.URI.out;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,240 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import riso.builder.conceptNet5.URI.in.Constantes;
-import riso.builder.wordnet.JWNL;
-import riso.builder.wordnet.JWNLException;
-import riso.builder.wordnet.data.IndexWord;
-import riso.builder.wordnet.data.IndexWordSet;
-import riso.builder.wordnet.data.POS;
-import riso.builder.wordnet.data.Pointer;
-import riso.builder.wordnet.data.PointerType;
-import riso.builder.wordnet.data.Synset;
-import riso.builder.wordnet.data.Word;
-import riso.builder.wordnet.dictionary.DatabaseBackedDictionary;
+import riso.builder.conceptNet5.URI.Constantes;
 
 import com.google.gson.Gson;
 
 public class LerJson {
 
-	public static final int ZERO = 0;
 	public static final int PAIS = 0;
 	public static final int JANELA = 5000;
-	public static final String ESPACO = " ";
-	public static final int POSICAO_GERAL = 1;
 
 
-	private static Set<ArestaConceptNet> eliminarTranslations(Set<ArestaConceptNet> edges){
-		Set<ArestaConceptNet> arestasSemTranslatOf = new HashSet<ArestaConceptNet>();
-
-		for (ArestaConceptNet aresta : edges) {
-			if(!aresta.getRel().equals("/r/TranslationOf")){
-				arestasSemTranslatOf.add(aresta);
-			}
-		}
-		//TODO imprime vetor final
-		System.out.println("Apos retirar TranslationOf...");
-		contaImprimeVetor(edges.size(), arestasSemTranslatOf.size());
-		//
-		return arestasSemTranslatOf;
-	}
-
-	
-	private static void carregaInformacoesWordNet(){
-		try {
-			JWNL.initialize(new FileInputStream("src/config/wordnet/database_properties.xml"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (JWNLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private static boolean verificaExistenciaMorfologica(POS pos, String termo){
-		IndexWordSet indexWordSet = null;
-		try {
-			indexWordSet = DatabaseBackedDictionary.getInstance().lookupAllIndexWords(termo);
-			IndexWord[] indWord = indexWordSet.getIndexWordArray();
-			if(indWord.length == ZERO){
-				return false;
-			}
-		} catch (JWNLException e) {
-			e.printStackTrace();
-		}
-		return indexWordSet.isValidPOS(pos);
-	}
-	
-	private static void agregaSinonimos(Nodo no){
-		String termo = no.getConceito();
-		IndexWordSet indexWordSet = null;
-		try {
-			
-			indexWordSet = DatabaseBackedDictionary.getInstance().lookupAllIndexWords(termo);
-			IndexWord idWord = indexWordSet.getIndexWord(POS.NOUN);
-
-			Synset synset = idWord.getSense(POSICAO_GERAL);
-			for (Word word : synset.getWords()) {
-				no.getSinonimos().add(word.getLemma());
-			}
-			
-		} catch (JWNLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		
-	}
-	
-	
-	private static void criaHierarquia(Nodo no){
-		
-		IndexWordSet indexWordSet = null;
-		
-		try {
-			indexWordSet = DatabaseBackedDictionary.getInstance().lookupAllIndexWords(no.getConceito());
-			IndexWord idWord = indexWordSet.getIndexWord(POS.NOUN);
-
-			if(idWord.getSenseCount() > ZERO){
-				
-				Synset syn = idWord.getSense(POSICAO_GERAL);
-				Pointer[] pontos = syn.getPointers(PointerType.HYPERNYM);
-				Nodo noDaVez = no;
-				while(pontos.length > ZERO){
-					Pointer ponto = pontos[ZERO];
-					Word words[] = ponto.getTargetSynset().getWords();
-					Nodo noPai = criaNo(words[ZERO].getLemma());
-					for (int i = 1; i < words.length; i++) {
-						noPai.getSinonimos().add(words[i].getLemma());
-					}
-					noPai.setFrase(ponto.getTargetSynset().getGloss());
-					noDaVez.getPai().add(noPai);
-					noPai.getFilho().add(noDaVez);
-							
-					pontos = ponto.getTargetSynset().getPointers(PointerType.HYPERNYM);
-					noDaVez = noPai;
-				}
-			}
-		} catch (JWNLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		imprimeGalho(no);
-		
-	}
-	
-	private static void imprimeGalho(Nodo no){
-		
-		Nodo noDaVez = no;
-		String ESPACO ="";
-		while(noDaVez != null){
-			String impressao = ESPACO+noDaVez.getConceito()+" ";
-			String sinonimos = "{";
-			if(!noDaVez.getSinonimos().isEmpty()){
-				
-				for (String str : noDaVez.getSinonimos()) {
-					sinonimos+=str+",";
-				}
-				sinonimos=sinonimos.substring(0, sinonimos.length()-1);
-				
-			}
-			sinonimos+="}";
-			impressao+=sinonimos;
-			System.out.println(impressao);
-			
-			ESPACO+=LerJson.ESPACO;
-			noDaVez = ((noDaVez.getPai() == null) || (noDaVez.getPai().size() == ZERO))?null:noDaVez.getPai().get(ZERO);
-		}
-	}
-	
-	private static void mesclaHierarquia(){
-		
-	}
-	
-	
-	private static List<Set<ArestaConceptNet>> eliminarConceitosFracamenteRelacionados(Set<ArestaConceptNet> edges, String termo){
-
-		Set<ArestaConceptNet> filhos = new HashSet<ArestaConceptNet>();
-		Set<ArestaConceptNet> pais = new HashSet<ArestaConceptNet>();
-		List<Set<ArestaConceptNet>>  paisEfilhos = new ArrayList<Set<ArestaConceptNet>>(); 
-		
-		for (ArestaConceptNet conceito : edges) {
-
-			String conceitoStart = conceito.getStartLemmas().trim();
-			String conceitoEnd = conceito.getEndLemmas().trim();
-			
-			if(verificaPaternidade(conceitoStart, termo)){
-				pais.add(conceito);
-			}else if(verificaPaternidade(conceitoEnd, termo)){
-				filhos.add(conceito);
-			}
-		}
-
-		paisEfilhos.add(pais);
-		paisEfilhos.add(filhos);
-		//TODO imprime vetor final
-		contaImprimeVetor(edges.size(), pais.size() + filhos.size());
-		//
-		System.out.println("Pais e filhos...");
-		System.out.println("Pais: "+pais.size());
-		for (ArestaConceptNet aresta : pais) {
-			System.out.println(aresta.getUri());
-		}
-		
-		System.out.println("Filhos: "+filhos.size());
-		for (ArestaConceptNet aresta : filhos) {
-			System.out.println(aresta.getUri());
-		}
-		//
-		return paisEfilhos;
-	}
-
-
-	private static boolean verificaPaternidade(String termoDaVez, String termo){
-		
-		if(termoDaVez.startsWith(termo+ESPACO)){
-			return true;
-		}else if(termoDaVez.endsWith(ESPACO+termo)){
-			
-			int ultimaOcorrenciaEspaco = termoDaVez.lastIndexOf(ESPACO);
-			String termoComposto = termoDaVez.substring(0, ultimaOcorrenciaEspaco) ;
-			boolean validade = verificaExistenciaMorfologica(POS.ADJECTIVE,termoComposto);
-			return validade;
-			
-		}else if(termoDaVez.equals(termo)){
-			return true;
-		}
-		
-		return false;
-	}
-
-	public static void contaImprimeVetor(int entrada,int saida){
-
-		System.out.println("Entrada: "+entrada);
-		System.out.println("Saida: "+saida);
-		System.out.println("Filtro: "+(entrada - saida));
-
-	}
-
-	private static Map<String, Set<ArestaConceptNet>> agrupaTipos(Set<ArestaConceptNet> arestas){
-		Map<String, Set<ArestaConceptNet>> agrupar = new HashMap<String, Set<ArestaConceptNet>>();
-
-		for (ArestaConceptNet aresta : arestas) {
-			String conceito = aresta.getStart();
-			Set<ArestaConceptNet> edgeList = agrupar.get(conceito);
-			if(edgeList == null){
-				edgeList = new HashSet<ArestaConceptNet>();
-				agrupar.put(conceito,edgeList);
-			}
-			edgeList.add(aresta);
-		}
-
-		return agrupar;
-	}
-
-
-	private static void parentesco(Map<String, Set<ArestaConceptNet>> agrupa){
-
+	private static void parentescoPorFilho(Map<String, Set<ArestaConceptNet>> agrupa){
 
 		Map<String, Nodo> controle = new HashMap<String, Nodo>();
 
@@ -269,46 +42,17 @@ public class LerJson {
 					if((noAtual == null) || (noDaVez == null)){
 
 						if(noAtual == null){	
-							noAtual = criaNo(atual);
+							noAtual = new Nodo(atual);
 						}
 
 						if((noDaVez == null)){
-							noDaVez = criaNo(daVez);
+							noDaVez = new Nodo(daVez);
 						}
 
 						controle.put(atual, noAtual);
 						controle.put(daVez, noDaVez);
-
-						Aresta arestaAtual = verificaExistenciaDeRelacao(atual, daVez);
-						Aresta arestaDaVez = verificaExistenciaDeRelacao(daVez, atual);
-
-						if(arestaAtual.getNumFound() > arestaDaVez.getNumFound()){
-							noAtual.getFilho().add(noDaVez);
-							noDaVez.getPai().add(noAtual);
-
-						}else if((arestaAtual.getNumFound() < arestaDaVez.getNumFound())){
-							noDaVez.getFilho().add(noAtual);
-							noAtual.getPai().add(noDaVez);
-						}
+						constroiRelacoes(noAtual,noDaVez);
 					}
-
-					/*
-					 * Abordagem agressiva...
-					 * 
-					 * List<RelacoesValoradas> relacoesValoradas = relacoesHierarquicas(atual);
-
-						for (RelacoesValoradas relacao : relacoesValoradas) {
-							//TODO.. Ajustar aqui...
-							Aresta aresta = lerJon(searchText+relacao.getRelacao(),"&",atual);
-							for (ArestaConceptNet conceito : aresta.getEdges()) {
-
-								String inicio = conceito.getStart();
-								String fim = conceito.getEnd();
-
-
-							}
-
-						}*/
 				}
 
 			}
@@ -316,78 +60,124 @@ public class LerJson {
 
 	}
 
+	public static void parentescoPorPadre(Map<String, Set<ArestaConceptNet>> agrupa){
 
-	private static Nodo criaNo(String conceito){
- 
-		Nodo no = new Nodo(conceito);
-		no.setFilho(new ArrayList<Nodo>());
-		no.setPai(new ArrayList<Nodo>());
-		no.setSinonimos(new ArrayList<String>());
-		return no;
+
 	}
 
-	private static Aresta verificaExistenciaDeRelacao(String conceitoInicio, String conceitoFim){
+	private static boolean verificaExistenciaDeRelacao(Nodo conceitoInicio, Nodo conceitoFim){
 
-		String finall = "http://conceptnet5.media.mit.edu/data/5.1/search?start="+conceitoInicio+"&end="+conceitoFim+"&limit=0";
+		String finall = "http://conceptnet5.media.mit.edu/data/5.1/search?start="+conceitoInicio.getConceito()+"&end="+conceitoFim.getConceito()+"&limit=0";
 
-		Aresta aresta = prepara(finall,"");
+		Aresta aresta = prepara(finall);
 
-		return aresta;
+		if(aresta.getNumFound() > Constantes.ZERO){
+			return true;
+		}
+		return false;
 	}
 
-	private static List<RelacoesValoradas> relacoesHierarquicas(String conceito){
+	private static void constroiRelacoes(Nodo conceitoInicio, Nodo conceitoFim){
 
-		String padrao = "http://conceptnet5.media.mit.edu/data/5.1/search?text="+conceito+"&rel=/r/";
-		List<RelacoesValoradas> relacoesValoradas = new ArrayList<RelacoesValoradas>();
-		String relacoesHierarquicas[] = new String[]{
-				Constantes.RELACAO_IS_A, 
-				Constantes.RELACAO_PART_OF, 
-				Constantes.RELACAO_DERIVEDED_FROM, 
-				Constantes.RELACAO_INSTANCE_OF, 
-				Constantes.RELACAO_MEMBER_OF};
+		boolean ordemDireta = verificaExistenciaDeRelacao(conceitoInicio, conceitoFim);
+		boolean ordemIversa = verificaExistenciaDeRelacao(conceitoFim, conceitoInicio);
+		if(ordemDireta || ordemIversa){
+			
+			Map<String, String> relacoesHierarquicas = Constantes.RELACOES_SEMANTICAS;
 
+			for (String relacao : relacoesHierarquicas.keySet()) {
 
-		for (String relacao : relacoesHierarquicas) {
-			String submiss = padrao+relacao;
-			Aresta aresta = prepara(submiss,"&limit=0");			
-			if(aresta.getNumFound() > ZERO){
-				relacoesValoradas.add(new RelacoesValoradas(relacao, aresta.getNumFound()));
+				constroiRelacao(conceitoInicio, relacao, conceitoFim);
+
 			}
 		}
+		
+	}
 
-		Collections.sort(relacoesValoradas);
+	/**
+	 * Se consegue estabelecer a relacao entre dois conceitos
+	 * retorna verdadeiro, caso contrario retorna false
+	 * 
+	 * @param conceitoInicio
+	 * @param relacao
+	 * @param conceitoFim
+	 * @return
+	 */
+	private static void constroiRelacao(Nodo conceitoInicio, String relacao, Nodo conceitoFim){
 
-		return relacoesValoradas;
+
+		String textConceitoInicio = conceitoInicio.getConceito();
+		String textConceitoFim = conceitoFim.getConceito();
+
+		String submissInicio = "http://conceptnet5.media.mit.edu/data/5.1/search?uri=/a/[/r/"+relacao+"/,"+textConceitoInicio+","+textConceitoFim+"]&limit=0";
+		String submissFim = "http://conceptnet5.media.mit.edu/data/5.1/search?uri=/a/[/r/"+relacao+"/,"+textConceitoFim+"/,"+textConceitoInicio+"]&limit=0";
+
+		Aresta arestaAtual = prepara(submissInicio);	
+		Aresta arestaDaVez = prepara(submissFim);			
+
+		if(arestaAtual.getNumFound() > arestaDaVez.getNumFound()){
+			posicionaNoEstrutura(conceitoInicio, relacao, conceitoFim);
+		}else if(arestaDaVez.getNumFound() > arestaAtual.getNumFound()){
+			posicionaNoEstrutura(conceitoFim, relacao, conceitoInicio);
+		}		
+	}
+
+	private static void posicionaNoEstrutura(Nodo inicio, String relacao, Nodo fim){
+
+		Estrutura estruturaInicio = inicio.getEstrutura();
+		Map<String, Set<Nodo>> relacoesInicio = estruturaInicio.getRelacoes();
+		Set<Nodo> nodosInicio = relacoesInicio.get(relacao);
+
+		if(nodosInicio == null){
+			nodosInicio = new HashSet<Nodo>();
+			relacoesInicio.put(relacao,nodosInicio);
+			nodosInicio.add(fim);	
+
+		}else{
+
+			Iterator<Nodo> nodosRelacao = nodosInicio.iterator();
+			boolean naoAdicionou = true;
+
+			while(nodosRelacao.hasNext()){
+
+				Nodo nodoDaVez = nodosRelacao.next();
+
+				String nodoDaVezRepresentacao = nodoDaVez.getConceito();
+				String nodoFinal = fim.getConceito();
+
+				String submissInicio = "http://conceptnet5.media.mit.edu/data/5.1/search?uri=/a/[/r/"+relacao+"/,"+nodoDaVezRepresentacao+","+nodoFinal+"]&limit=0";
+				String submissFim = "http://conceptnet5.media.mit.edu/data/5.1/search?uri=/a/[/r/"+relacao+"/,"+nodoFinal+","+nodoDaVezRepresentacao+"]&limit=0";
+
+				Aresta arestaAtual = prepara(submissInicio);	
+				Aresta arestaDaVez = prepara(submissFim);			
+
+				if(arestaAtual.getNumFound() > arestaDaVez.getNumFound()){
+					posicionaNoEstrutura(nodoDaVez, relacao, fim);
+					posicionaNoEstrutura(fim, Constantes.RELACOES_SEMANTICAS.get(relacao), nodoDaVez);
+					naoAdicionou = false;
+				}else if(arestaDaVez.getNumFound() > arestaAtual.getNumFound()){
+					nodosInicio.remove(nodoDaVez);
+					nodosInicio.add(fim);
+					posicionaNoEstrutura(fim, relacao, nodoDaVez);
+					posicionaNoEstrutura(nodoDaVez, Constantes.RELACOES_SEMANTICAS.get(relacao), fim);
+					naoAdicionou = false;
+				}		
+			}
+			if(naoAdicionou){
+				nodosInicio.add(fim);	
+			}
+		}
 	}
 
 
-
-
-	private static Aresta lerJon(String fonte, String caracter, String conceito){
-
-		String finall = conceito+caracter+"limit=0";
-
-		Aresta aresta = prepara(fonte, finall);
-
-		if(aresta.getNumFound() > JANELA){
-			aresta =  prepara(fonte, conceito+caracter+"limit="+JANELA);
-			aresta.setPossuePoll(true);
-			aresta.setPercorridos(JANELA);
-		}
-		aresta = prepara(fonte, conceito+caracter+"limit="+aresta.getNumFound());
-
-		return aresta;
-	}	
-
-
-	private static Aresta prepara(String fonte, String termo){
+	private static Aresta prepara(String request){
 
 		Gson gson = new Gson();
 		Aresta aresta = new Aresta();
 
 		try {
 
-			URL url = new URL(fonte+termo);
+			URL url = new URL(request);
 			/*
 			 * Como realizar a chamada a uma lista de associacao
 			 * URL url = new URL("http://conceptnet5.media.mit.edu/data/5.1/assoc/list/en/boy,girl@-1?limit=5&rel=/r/PartOf/&offset=3&end=/c/en/car/");
@@ -405,97 +195,168 @@ public class LerJson {
 
 	//OK
 	private static void montaAncestrais(String fonte, String caracter, String conceito){
-		Aresta aresta = lerJon(fonte, caracter, conceito);
-
-		Set<ArestaConceptNet> arestasSemTranslatOf = eliminarTranslations(aresta.getEdges());
-
-		List<Set<ArestaConceptNet>> paisEFilhos = eliminarConceitosFracamenteRelacionados(arestasSemTranslatOf, conceito);
-
+		
+		FiltroDeResultados filtro = new FiltroDeResultados();
+		List<Set<ArestaConceptNet>> paisEFilhos = null;
+		Aresta aresta = gerenciaSolicitacoes(fonte, caracter, conceito);
+		paisEFilhos = filtro.eliminarConceitosFracamenteRelacionados(aresta.getEdges(), conceito);
 		Set<ArestaConceptNet> pais = paisEFilhos.get(PAIS);
-
-		Map<String, Set<ArestaConceptNet>> agrupa = agrupaTipos(pais);
-		imprimeGrupos(agrupa);
-		//parentesco(agrupa);
-
-
+		Map<String, Set<ArestaConceptNet>> agrupa = filtro.agrupaTipos(pais);
+		parentescoPorFilho(agrupa);
 
 	}
 
-	//OK
-	private static void imprimeGrupos(Map<String, Set<ArestaConceptNet>> agrupa){
-		for (String str : agrupa.keySet()) {
-			String st = str+"{";
-			for (ArestaConceptNet ar : agrupa.get(str)) {
-				st+=ar.getEndLemmas()+",";
+	public static Aresta gerenciaSolicitacoes(String fonte, String caracter, String conceito){
+	
+		String uriFinal = fonte+conceito+caracter+Constantes.LIMIT;
+		Aresta aresta = prepara(uriFinal+Constantes.ZERO);
+		Aresta arestaAux = null;
+		if(aresta.getNumFound() > JANELA){
+			int qtIt = aresta.getNumFound() / JANELA;
+			int rest = aresta.getNumFound() % JANELA;
+			int i = 1;
+			aresta = prepara(uriFinal+JANELA);
+			while(i < qtIt){
+				arestaAux = prepara(uriFinal+JANELA+Constantes.OFFSET+i*JANELA);
+				aresta.addSetEdge(arestaAux.getEdges());
+				i++;
 			}
-			st = st.substring(0, st.length()-1);
-			st +="}";
-			System.out.println(st);
-
+			arestaAux = prepara(uriFinal+rest+Constantes.OFFSET+i*JANELA);
+			aresta.addSetEdge(arestaAux.getEdges());
+		}else{
+			aresta = prepara(uriFinal+aresta.getNumFound());
 		}
+		return aresta;
 	}
-
-
-	private static void verificaElementosExclusivos(Set<ArestaConceptNet> atual, Set<ArestaConceptNet> comparada){
-
-		Set<ArestaConceptNet> elementosIguais = new HashSet<ArestaConceptNet>();
-
-		Iterator<ArestaConceptNet> elemento = atual.iterator();
-
-		while(elemento.hasNext()){
-			ArestaConceptNet arestaAtual = elemento.next();
-			Iterator<ArestaConceptNet> comparado = comparada.iterator();
-
-			while(comparado.hasNext()){
-				ArestaConceptNet arestaComparada = comparado.next();
-				if(arestaAtual.equals(arestaComparada)){
-					elementosIguais.add(arestaAtual);
-					break;
-				}
-			}
-		}
-		atual.removeAll(elementosIguais);
-		System.out.println("QtIguais:"+elementosIguais.size());
-		System.out.println("QtExclusivos:"+atual.size());
-		//		for (ArestaConceptNet aresta : atual) {
-		//			System.out.println(aresta.getUri());
-		//		}
-
-	}
-
-
+	
 
 	public static void main(String[] args) {
 
-
-		carregaInformacoesWordNet();
-		
-		
-		Nodo no = criaNo("product");
-		agregaSinonimos(no);
-		
-		System.out.println(no.getSinonimos());
-		criaHierarquia(no);
-
-		
-		//String conceito = "jaguar";
-
-		//String searchText = "http://conceptnet5.media.mit.edu/data/5.1/search?text=";
+		String searchText = "http://conceptnet5.media.mit.edu/data/5.1/search?text=";
 		//String searchSurface = "http://conceptnet5.media.mit.edu/data/5.1/search?surfaceText=";
 
 		//String lookUp = "http://conceptnet5.media.mit.edu/data/5.1/c/en/";
 
+		String conceito = "jaguar";
 
-		//montaAncestrais(searchText,"&",conceito);
-		
-		
-		
+		montaAncestrais(searchText,"&",conceito);
 
-//		List<RelacoesValoradas> relacoes = relacoesHierarquicas("big");
-//
-//		for (RelacoesValoradas relacoesValoradas : relacoes) {
-//			System.out.println(relacoesValoradas.getRelacao());
-//		}
+		/*Aresta aresta = prepara(searchText+"jaguar&limit="+Constantes.ZERO);
+		System.out.println("O que deve ser: "+aresta.getNumFound());
+		Aresta arestaAux = null;
+
+
+		long inicio = System.currentTimeMillis();
+		if(aresta.getNumFound() > JANELA){
+			int qtIt = aresta.getNumFound() / JANELA;
+			int rest = aresta.getNumFound() % JANELA;
+			int i = 1;
+			aresta = prepara(searchText+"jaguar&limit="+JANELA);
+			while(i < qtIt){
+				arestaAux = prepara(searchText+"jaguar&limit="+JANELA+"&offset="+i*JANELA);
+				aresta.addSetEdge(arestaAux.getEdges());
+				i++;
+			}
+			arestaAux = prepara(searchText+"jaguar&limit="+rest+"&offset="+i*JANELA);
+			aresta.addSetEdge(arestaAux.getEdges());
+		}else{
+			aresta = prepara(searchText+"jaguar&limit="+aresta.getNumFound());
+		}
+		System.out.println("Tempo gasto:"+ ((System.currentTimeMillis() - inicio) / 1000)+ "segundos");
+		System.out.println("O que veio: "+aresta.getEdges().size());*/
+
+
+
+		//Nodo jaguar = new Nodo("/c/en/jaguar/");
+		//		Nodo animal = new Nodo("/c/en/animal/");
+		//		Nodo mamifero = new Nodo("/c/en/mammal/");
+		//		Nodo organism = new Nodo("/c/en/organism/n/a_living_thing_that_has_the_ability_to_act_or_function_independently/");
+		//
+		//		Nodo liveThing = new Nodo("/c/en/live_thing/n/a_living_entity/");
+		//
+		//		Nodo life = new Nodo("/c/en/life/n/living_things_collectively/");
+		//		Nodo plant = new Nodo("/c/en/plant/");
+		//
+		//		Set<Nodo> nodos = new HashSet<Nodo>();
+		//		Map<String, Set<Nodo>> relacoes = new HashMap<String, Set<Nodo>>();
+		//		nodos.add(life);
+		//		nodos.add(organism);
+		//		relacoes.put("IsA", nodos);
+		//
+		//		Estrutura estru = new Estrutura();
+		//		estru.setRelacoes(relacoes);
+		//		plant.setEstrutura(estru);
+		//		constroiRelacoes(plant, liveThing);
+
+
+		//Caso 2 - OK - troca de posicao entre jaguar-animal para jaguar-mamifero
+		/*Set<Nodo> nodos = new HashSet<Nodo>();
+		Map<String, Set<Nodo>> relacoes = new HashMap<String, Set<Nodo>>();
+		nodos.add(animal);
+		relacoes.put("IsA", nodos);
+
+		Estrutura estru = new Estrutura();
+		estru.setRelacoes(relacoes);
+		jaguar.setEstrutura(estru);
+		constroiRelacoes(jaguar, mamifero);*/
+
+
+		//Caso 3 - OK -  troca de posicao entre jaguar-animal para jaguar-mamifero
+		/*Set<Nodo> nodos = new HashSet<Nodo>();
+		Map<String, Set<Nodo>> relacoes = new HashMap<String, Set<Nodo>>();
+		nodos.add(mamifero);
+		relacoes.put("IsA", nodos);
+
+		Estrutura estru = new Estrutura();
+		estru.setRelacoes(relacoes);
+		jaguar.setEstrutura(estru);
+		constroiRelacoes(jaguar, animal);*/
+
+		//Caso 4 - OK -  adicionar elementos de mesma relação que não possuem 
+		//relação hierarquica com os que já estao adicionados. 
+		//Colocar nós semanticamente de mesmo nível
+		/*Set<Nodo> nodos = new HashSet<Nodo>();
+		Map<String, Set<Nodo>> relacoes = new HashMap<String, Set<Nodo>>();
+		nodos.add(life);
+		relacoes.put("IsA", nodos);
+
+		Estrutura estru = new Estrutura();
+		estru.setRelacoes(relacoes);
+		plant.setEstrutura(estru);
+		constroiRelacoes(plant, organism);*/
+
+
+		/*Nodo organism = new Nodo("/c/en/organism/n/a_living_thing_that_has_the_ability_to_act_or_function_independently/");
+
+		Nodo liveThing = new Nodo("/c/en/live_thing/n/a_living_entity/");
+
+		Nodo life = new Nodo("/c/en/life/n/living_things_collectively/");
+		Nodo plant = new Nodo("/c/en/plant/");
+
+		Set<Nodo> nodos = new HashSet<Nodo>();
+		Map<String, Set<Nodo>> relacoes = new HashMap<String, Set<Nodo>>();
+		nodos.add(life);
+		nodos.add(organism);
+		relacoes.put("IsA", nodos);
+
+		Estrutura estru = new Estrutura();
+		estru.setRelacoes(relacoes);
+		plant.setEstrutura(estru);
+		constroiRelacoes(plant, liveThing);*/
+
+
+
+
+
+
+
+
+
+		//		List<RelacoesValoradas> relacoes = relacoesHierarquicas("big");
+		//
+		//		for (RelacoesValoradas relacoesValoradas : relacoes) {
+		//			System.out.println(relacoesValoradas.getRelacao());
+		//		}
 		//System.out.println("Antes ============== :"+listlookUp.size());
 
 		//Set<ArestaConceptNet>  listSearchText = montaAncestrais(searchText,"&",conceito);

@@ -1,6 +1,6 @@
 package riso.builder.conceptNet5.URI.in.types;
 
-import riso.builder.conceptNet5.URI.in.Constantes;
+import riso.builder.conceptNet5.URI.Constantes;
 import riso.builder.conceptNet5.URI.in.interfaces.Retornavel;
 
 public enum IdiomasConceptNet implements Retornavel {
