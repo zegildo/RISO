@@ -60,7 +60,10 @@ public class Constantes {
 	public static final String RELACAO_CLASS_OF = "ClassOf";
 	public static final String RELACAO_SOURCE_OF = "SourceOf";
 
-	public static final Map<String, String> RELACOES_SEMANTICAS;
+	
+	public static final String[] RELACOES_SEMANTICAS_FORTES = {RELACAO_IS_A,RELACAO_MEMBER_OF,RELACAO_PART_OF,RELACAO_INSTANCE_OF,RELACAO_DERIVEDED_FROM};
+	
+	public static final Map<String, String> RELACOES_SEMANTICAS_DIRETAS;
     static {
         Map<String, String> relacoesSemanticas = new HashMap<String, String>();
         relacoesSemanticas.put(RELACAO_HAS_PROPERTY, RELACAO_IS_A_PROPERTY_OF);
@@ -72,7 +75,22 @@ public class Constantes {
         relacoesSemanticas.put(RELACAO_PART_OF, RELACAO_COMPOUND_OF);
         relacoesSemanticas.put(RELACAO_MEMBER_OF, RELACAO_HAS_MEMBERS);
         relacoesSemanticas.put(RELACAO_IS_A, RELACAO_CAN_BE);
-        RELACOES_SEMANTICAS = Collections.unmodifiableMap(relacoesSemanticas);
+        RELACOES_SEMANTICAS_DIRETAS = Collections.unmodifiableMap(relacoesSemanticas);
+    }
+    
+    public static final Map<String, String> RELACOES_SEMANTICAS_INVERSA;
+    static {
+        Map<String, String> relacoesSemanticas = new HashMap<String, String>();
+        relacoesSemanticas.put(RELACAO_IS_A_PROPERTY_OF,RELACAO_HAS_PROPERTY);
+        relacoesSemanticas.put(RELACAO_CLASS_OF,RELACAO_INSTANCE_OF);
+        relacoesSemanticas.put(RELACAO_SOURCE_OF,RELACAO_DERIVEDED_FROM);
+        relacoesSemanticas.put(RELACAO_SYNONYM,RELACAO_SYNONYM);
+        relacoesSemanticas.put(RELACAO_RELATED_TO,RELACAO_RELATED_TO);
+        relacoesSemanticas.put(RELACAO_BELONGS_TO,RELACAO_HAS_A);
+        relacoesSemanticas.put(RELACAO_COMPOUND_OF,RELACAO_PART_OF);
+        relacoesSemanticas.put(RELACAO_HAS_MEMBERS,RELACAO_MEMBER_OF);
+        relacoesSemanticas.put(RELACAO_CAN_BE,RELACAO_IS_A);
+        RELACOES_SEMANTICAS_INVERSA = Collections.unmodifiableMap(relacoesSemanticas);
     }
 		
 	public static final String DATA_WORDNET = "wordnet";

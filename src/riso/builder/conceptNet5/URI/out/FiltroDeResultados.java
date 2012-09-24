@@ -14,10 +14,11 @@ public class FiltroDeResultados {
 
 
 
-	public Map<String, Set<ArestaConceptNet>> agrupaTipos(Set<ArestaConceptNet> arestas){
+	public Map<String, Set<ArestaConceptNet>> criaGrupoDePais(Set<ArestaConceptNet> arestas){
 		Map<String, Set<ArestaConceptNet>> agrupar = new HashMap<String, Set<ArestaConceptNet>>();
 
 		for (ArestaConceptNet aresta : arestas) {
+			
 			String conceito = aresta.getStart();
 			Set<ArestaConceptNet> edgeList = agrupar.get(conceito);
 			if(edgeList == null){
@@ -27,8 +28,31 @@ public class FiltroDeResultados {
 			edgeList.add(aresta);
 		}
 
+		imprimeGrupos(agrupar);
+		
 		return agrupar;
 	}
+	
+	
+	public Map<String, Set<ArestaConceptNet>> criaGrupoDeFilhos(Set<ArestaConceptNet> arestas){
+		Map<String, Set<ArestaConceptNet>> agrupar = new HashMap<String, Set<ArestaConceptNet>>();
+
+		for (ArestaConceptNet aresta : arestas) {
+			String conceito = aresta.getEnd();
+			Set<ArestaConceptNet> edgeList = agrupar.get(conceito);
+			if(edgeList == null){
+				edgeList = new HashSet<ArestaConceptNet>();
+				agrupar.put(conceito,edgeList);
+			}
+			edgeList.add(aresta);
+		}
+		
+		return agrupar;
+	}
+	
+	
+	
+	
 
 	//OK
 	public void imprimeGrupos(Map<String, Set<ArestaConceptNet>> agrupa){
@@ -54,45 +78,50 @@ public class FiltroDeResultados {
 
 	public List<Set<ArestaConceptNet>> eliminarConceitosFracamenteRelacionados(Set<ArestaConceptNet> edges, String termo){
 
-		Set<ArestaConceptNet> filhos = new HashSet<ArestaConceptNet>();
-		Set<ArestaConceptNet> pais = new HashSet<ArestaConceptNet>();
+		Set<ArestaConceptNet> termoEhGeneralizacao = new HashSet<ArestaConceptNet>();
+		Set<ArestaConceptNet> termoEhEspecializacao = new HashSet<ArestaConceptNet>();
 		List<Set<ArestaConceptNet>>  paisEfilhos = new ArrayList<Set<ArestaConceptNet>>(); 
 		UsuarioWordNet usuarioWordnet = UsuarioWordNet.getInstance();
 
 		final String RELACAO_TRL_OF = "/"+Constantes.RELACOES+"/"+Constantes.RELACAO_TRANSLATION_OF;
+		final String RELACAO = "/"+Constantes.RELACOES+"/";
 
 		for (ArestaConceptNet conceito : edges) {
-			
+
 			if(!conceito.getRel().equals(RELACAO_TRL_OF)){
-				
+
 				String conceitoStart = conceito.getStartLemmas().trim();
 				String conceitoEnd = conceito.getEndLemmas().trim();
+				String relacao = conceito.getRel().replaceAll(RELACAO, "");
 
-				if(usuarioWordnet.verificaPaternidade(conceitoStart, termo)){
-					pais.add(conceito);
-				}else if(usuarioWordnet.verificaPaternidade(conceitoEnd, termo)){
-					filhos.add(conceito);
+				if(usuarioWordnet.verificaRelacao(conceitoStart,relacao, termo)){
+					termoEhEspecializacao.add(conceito);
+				}else if(usuarioWordnet.verificaRelacao(conceitoEnd, relacao, termo)){
+					termoEhGeneralizacao.add(conceito);
 				}
 			}
-
 		}
 
-		paisEfilhos.add(pais);
-		paisEfilhos.add(filhos);
-		//TODO imprime vetor final
-		contaImprimeVetor(edges.size(), pais.size() + filhos.size());
-		//
-		System.out.println("Pais e filhos...");
-		System.out.println("Pais: "+pais.size());
-		for (ArestaConceptNet aresta : pais) {
-			System.out.println(aresta.getUri());
-		}
-
-		System.out.println("Filhos: "+filhos.size());
-		for (ArestaConceptNet aresta : filhos) {
-			System.out.println(aresta.getUri());
-		}
-		//
+		paisEfilhos.add(termoEhEspecializacao);
+		paisEfilhos.add(termoEhGeneralizacao);
+//		//TODO imprime vetor final
+//		contaImprimeVetor(edges.size(), termoEhEspecializacao.size() + termoEhGeneralizacao.size());
+//		//
+//		System.out.println("Pais e filhos...");
+//		System.out.println("Pais: "+termoEhEspecializacao.size());
+//		for (ArestaConceptNet aresta : termoEhEspecializacao) {
+//			System.out.println(aresta.getUri());
+//		}
+//
+//		System.out.println("Filhos: "+termoEhGeneralizacao.size());
+//		for (ArestaConceptNet aresta : termoEhGeneralizacao) {
+//			System.out.println(aresta.getUri());
+//		}
+//		//
+//		Set<ArestaConceptNet> conceitos = new HashSet<ArestaConceptNet>();
+//		conceitos.addAll(termoEhEspecializacao);
+//		conceitos.addAll(termoEhGeneralizacao);
+//		verificaElementosExclusivos(edges, conceitos);
 		return paisEfilhos;
 	}
 
@@ -119,9 +148,11 @@ public class FiltroDeResultados {
 		atual.removeAll(elementosIguais);
 		System.out.println("QtIguais:"+elementosIguais.size());
 		System.out.println("QtExclusivos:"+atual.size());
-		//		for (ArestaConceptNet aresta : atual) {
-		//			System.out.println(aresta.getUri());
-		//		}
+		
+		System.out.println("Verifica Elementos Exclusivos...");
+		for (ArestaConceptNet aresta : atual) {
+			System.out.println(aresta.getUri());
+		}
 
 	}
 }
