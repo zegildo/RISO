@@ -51,7 +51,7 @@ public class Constantes {
 	public static final String RELACAO_LOCATED_NEAR = "LocatedNear";
 	public static final String RELACAO_CONCEPTUALLY_RELATED_TO = "ConceptuallyRelatedTo";
 	public static final String RELACAO_SYNONYM = "Synonym";
-	//Novas relacoes - relacoes inversas criadas para compor a tabela de relacoes sem‰ntias
+	//Novas relacoes - relacoes inversas criadas para compor a tabela de relacoes semï¿½ntias
 	public static final String RELACAO_COMPOUND_OF = "CompoundOf";
 	public static final String RELACAO_HAS_MEMBERS = "HasMembers";
 	public static final String RELACAO_CAN_BE = "CanBe";
@@ -60,7 +60,12 @@ public class Constantes {
 	public static final String RELACAO_CLASS_OF = "ClassOf";
 	public static final String RELACAO_SOURCE_OF = "SourceOf";
 
-	
+	public static final String[] RELACOES_TRANSITIVAS = {RELACAO_IS_A,RELACAO_INSTANCE_OF,RELACAO_PART_OF, 
+		RELACAO_HAS_PREQUISITE,RELACAO_AT_LOCATION,RELACAO_DERIVEDED_FROM
+		,RELACAO_MEMBER_OF,RELACAO_CREATED_BY,RELACAO_HAS_A,RELACAO_DEFINED_AS,
+		RELACAO_SILIMAR_SIZE,RELACAO_NOT_IS_A,RELACAO_LOCATED_NEAR};
+
+	public static final String[] RELACOES_SIMETRICAS ={RELACAO_RELATED_TO,RELACAO_SYNONYM,RELACAO_CONCEPTUALLY_RELATED_TO};
 	public static final String[] RELACOES_SEMANTICAS_FORTES = {RELACAO_IS_A,RELACAO_MEMBER_OF,RELACAO_PART_OF,RELACAO_INSTANCE_OF,RELACAO_DERIVEDED_FROM};
 	
 	public static final Map<String, String> RELACOES_SEMANTICAS_DIRETAS;

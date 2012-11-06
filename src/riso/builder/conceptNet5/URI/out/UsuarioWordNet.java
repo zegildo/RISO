@@ -111,22 +111,24 @@ public final class UsuarioWordNet {
 	//	}
 
 	public boolean verificaRelacao(String termoDaVez, String relacao, String termo){
+		final String RELACAO = "/"+Constantes.RELACOES+"/";
 
-		if(termoDaVez.startsWith(termo+ESPACO)){
-			return true;
-			
-		}else if(termoDaVez.endsWith(ESPACO+termo)){
-			
-			int ultimaOcorrenciaEspaco = termoDaVez.lastIndexOf(ESPACO);
-			String termoComposto = termoDaVez.substring(0, ultimaOcorrenciaEspaco) ;
-			boolean validade = verificaExistenciaMorfologica(POS.ADJECTIVE,termoComposto);
-			
-			return validade;
-			
-		}else if(termoDaVez.equals(termo)){
-			return true;
-		}
-		return false;
+		return (!termoDaVez.equals(termo) && (relacao.startsWith(RELACAO)));
+//		if(termoDaVez.startsWith(termo+ESPACO)){
+//			return true;
+//			
+//		}else if(termoDaVez.endsWith(ESPACO+termo)){
+//			
+//			int ultimaOcorrenciaEspaco = termoDaVez.lastIndexOf(ESPACO);
+//			String termoComposto = termoDaVez.substring(0, ultimaOcorrenciaEspaco) ;
+//			boolean validade = verificaExistenciaMorfologica(POS.ADJECTIVE,termoComposto);
+//			
+//			return validade;
+//			
+//		}else if(termoDaVez.equals(termo)){
+//			return true;
+//		}
+//		return false;
 	}
 
 

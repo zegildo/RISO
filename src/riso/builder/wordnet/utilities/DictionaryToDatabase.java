@@ -89,7 +89,7 @@ public class DictionaryToDatabase
 		{
 			
 			String scriptFileName = "src/config/wordnet/createWordNetDataBase.sql";
-			ConnectionManager mgr = new ConnectionManager("org.postgresql.Driver", "jdbc:postgresql://localhost:5432/jwnl?user=postgres&password=capacida",null, null);
+			ConnectionManager mgr = new ConnectionManager("org.postgresql.Driver", "jdbc:postgresql://localhost:23456/wordnet?user=postgres&password=postgres",null, null);
 			conn = mgr.getConnection();
 			DictionaryToDatabase d2d = new DictionaryToDatabase(conn);
 			d2d.createTables(scriptFileName);
