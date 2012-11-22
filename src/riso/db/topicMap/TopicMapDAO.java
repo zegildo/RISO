@@ -16,9 +16,9 @@ import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
 
-public class DBTopicMap {
+public class TopicMapDAO {
 
-	private final String ARQUIVO_CONFIG = "src/jena/sdb.ttl";
+	private final String ARQUIVO_CONFIG = "src/riso/db/sdb.ttl";
 	private final String TOPIC_MAP = "topicMap";
 
 
@@ -43,7 +43,7 @@ public class DBTopicMap {
 		store.close() ;
 	}
 
-	public void criaGrafoNomeado(Model grafo, Map<String,String> prefixos){
+	public void criaGrafoNomeado(Model grafo){
 
 		Store store = SDBFactory.connectStore(ARQUIVO_CONFIG);
 		Model model = SDBFactory.connectNamedModel(store, TOPIC_MAP) ;
@@ -51,8 +51,8 @@ public class DBTopicMap {
 		try{
 			model.begin();
 			model.add(grafo);
-			for (String relacao : prefixos.keySet()) {
-				model.setNsPrefix(relacao, prefixos.get(relacao));
+			for (String relacao : grafo.getNsPrefixMap().keySet()) {
+				model.setNsPrefix(relacao, grafo.getNsPrefixMap().get(relacao));
 			}
 			model.commit();
 		}catch(Exception e){
@@ -81,9 +81,9 @@ public class DBTopicMap {
 		}
 	}
 
-	public Model recuperaModeloNomeado(String nomeModelo){
+	public Model recuperaModeloNomeado(){
 		Store store = SDBFactory.connectStore(ARQUIVO_CONFIG);
-		Model model = SDBFactory.connectNamedModel(store,nomeModelo);
+		Model model = SDBFactory.connectNamedModel(store, TOPIC_MAP);
 
 		return model;
 	}

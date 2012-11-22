@@ -179,7 +179,7 @@ public class JenaOWL {
 
 		List<VetorTematico> vetoresTematicos = new ArrayList<VetorTematico>();
 		for (List<String> list : grafo) {
-			vetoresTematicos.add(new VetorTematico(list));
+			vetoresTematicos.add(new VetorTematico(list,"jaguar"));
 		}
 		
 		ConceitoExpandido conceito = new ConceitoExpandido("jaguar", vetoresTematicos, minimalGraph);
