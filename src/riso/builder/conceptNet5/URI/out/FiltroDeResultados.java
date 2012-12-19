@@ -3,11 +3,9 @@ package riso.builder.conceptNet5.URI.out;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -121,12 +119,14 @@ public class FiltroDeResultados {
 
 		if(!getConceitosAcrescentados().containsKey(conceito)){
 			if(conceito.contains("/n/")){
-				String superConceito = conceito.substring(0, conceito.lastIndexOf("/n/"));
+				int posicao = conceito.lastIndexOf("/n/");
+				String subConceito = conceito.substring(0,posicao);
+				String superConceito = conceito.substring(posicao, conceito.length());
 				ArestaConceptNet aresta = new ArestaConceptNet();
-				aresta.setStart(conceito);
+				aresta.setStart(subConceito);
 				aresta.setRel(RELACAO+Constantes.RELACAO_IS_A);
 				aresta.setEnd(superConceito);
-				aresta.setUri("/a/[/r/IsA/,"+conceito+"/,"+superConceito+"/]");
+				aresta.setUri("/a/[/r/IsA/,"+subConceito+"/,"+superConceito+"/]");
 				getAfirmacoes().add(aresta);		
 			}
 			getConceitosAcrescentados().put(conceito, "");
@@ -160,15 +160,15 @@ public class FiltroDeResultados {
 
 				relacao = verificaExistenciaDeRelacoesFortes(conceitoFim, conceitoInicio);
 
-//				if(relacao == null){
-//
-//					relacao = verificaExistenciaDeAlgumaRelacao(conceitoInicio, conceitoFim);
-//
-//					if(relacao == null){
-//
-//						relacao = verificaExistenciaDeAlgumaRelacao(conceitoFim, conceitoInicio);
-//					}	
-//				}	
+				//				if(relacao == null){
+				//
+				//					relacao = verificaExistenciaDeAlgumaRelacao(conceitoInicio, conceitoFim);
+				//
+				//					if(relacao == null){
+				//
+				//						relacao = verificaExistenciaDeAlgumaRelacao(conceitoFim, conceitoInicio);
+				//					}	
+				//				}	
 			}
 		}
 
@@ -182,7 +182,7 @@ public class FiltroDeResultados {
 
 
 
-	public Set<ArestaConceptNet> getAfirmacoes(Set<ArestaConceptNet> arestas){
+	public Set<ArestaConceptNet> obtemAfirmacoesOcultas(Set<ArestaConceptNet> arestas){
 		Map<String, Set<ArestaConceptNet>> agrupar = new HashMap<String, Set<ArestaConceptNet>>();
 
 		long inicio = System.currentTimeMillis();
@@ -209,7 +209,7 @@ public class FiltroDeResultados {
 			}
 			edgeList.add(aresta);
 		}
-		System.out.println("Tempo gasto:"+ ((System.currentTimeMillis() - inicio) / 1000)+ "segundos");
+		System.out.println(((System.currentTimeMillis() - inicio) / 1000)+ " segundos");
 		colocaAfirmacoesEmArquivo();
 
 		return getAfirmacoes();
@@ -280,60 +280,64 @@ public class FiltroDeResultados {
 
 	}
 
-	public List<Set<ArestaConceptNet>> eliminarConceitosFracamenteRelacionados(String fonte, String caracter, String termo){
+	public Set<ArestaConceptNet> eliminarAfirmacoesInuteis(String fonte, String caracter, String termo){
 
-		Set<ArestaConceptNet> termoEhGeneralizacao = new HashSet<ArestaConceptNet>();
-		Set<ArestaConceptNet> termoEhEspecializacao = new HashSet<ArestaConceptNet>();
-		List<Set<ArestaConceptNet>>  paisEfilhos = new ArrayList<Set<ArestaConceptNet>>(); 
-		UsuarioWordNet usuarioWordnet = UsuarioWordNet.getInstance();
+		Set<ArestaConceptNet> afirmacoesUteis = new HashSet<ArestaConceptNet>();
 
 		final String RELACAO_TRL_OF = "/"+Constantes.RELACOES+"/"+Constantes.RELACAO_TRANSLATION_OF;
-
+		final String PADRAO_INGLES = "/"+Constantes.IDIOMA_INGLES+"/";
 		Aresta aresta = getGerenciador().gerenciaSolicitacoes(fonte, caracter, termo);
 		Set<ArestaConceptNet> edges = aresta.getEdges();
 
 		for (ArestaConceptNet conceito : edges) {
+			String conceitoInicial = conceito.getStart();
+			String conceitoFinal = conceito.getEnd();
 
-			if(!conceito.getRel().equals(RELACAO_TRL_OF)){
+			if(!conceito.getRel().equals(RELACAO_TRL_OF) && 
+					(conceitoInicial.contains(PADRAO_INGLES) && 
+							(conceitoFinal.contains(PADRAO_INGLES)))){
 
-				String conceitoStart = conceito.getStartLemmas().trim();
-				String conceitoEnd = conceito.getEndLemmas().trim();
 				String relacao = conceito.getRel();
 
-				if(usuarioWordnet.verificaRelacao(conceitoStart,relacao, termo)){
-					termoEhEspecializacao.add(conceito);
-				}else if(usuarioWordnet.verificaRelacao(conceitoEnd, relacao, termo)){
-					termoEhGeneralizacao.add(conceito);
+				if(verificaRelacao(relacao)){
+					afirmacoesUteis.add(conceito);
 				}
 			}
 		}
 
-		paisEfilhos.add(termoEhEspecializacao);
-		paisEfilhos.add(termoEhGeneralizacao);
-		//TODO imprime vetor final
-		contaImprimeVetor(edges.size(), termoEhEspecializacao.size() + termoEhGeneralizacao.size());
+		return afirmacoesUteis;
+		//		paisEfilhos.add(termoEhEspecializacao);
+		//		paisEfilhos.add(afirmacoesUteis);
+		//		//TODO imprime vetor final
+		//		contaImprimeVetor(edges.size(), termoEhEspecializacao.size() + afirmacoesUteis.size());
+		//		//
+		//		System.out.println("Pais e filhos...");
+		//		System.out.println("Pais: "+termoEhEspecializacao.size());
 		//
-		System.out.println("Pais e filhos...");
-		System.out.println("Pais: "+termoEhEspecializacao.size());
-
-		for (ArestaConceptNet ar : termoEhEspecializacao) {
-			System.out.println(ar.getUri());
-		}
-
-		System.out.println("Filhos: "+termoEhGeneralizacao.size());
-
-		for (ArestaConceptNet are : termoEhGeneralizacao) {
-			System.out.println(are.getUri());
-		}
+		//		for (ArestaConceptNet ar : termoEhEspecializacao) {
+		//			System.out.println(ar.getUri());
+		//		}
 		//
-		Set<ArestaConceptNet> conceitos = new HashSet<ArestaConceptNet>();
-		conceitos.addAll(termoEhEspecializacao);
-		conceitos.addAll(termoEhGeneralizacao);
-		verificaElementosExclusivos(edges, conceitos);
-
-		return paisEfilhos;
+		//		System.out.println("Filhos: "+afirmacoesUteis.size());
+		//
+		//		for (ArestaConceptNet are : afirmacoesUteis) {
+		//			System.out.println(are.getUri());
+		//		}
+		//		//
+		//		Set<ArestaConceptNet> conceitos = new HashSet<ArestaConceptNet>();
+		//		conceitos.addAll(termoEhEspecializacao);
+		//		conceitos.addAll(afirmacoesUteis);
+		//		verificaElementosExclusivos(edges, conceitos);
+		//
+		//		return paisEfilhos;
 	}
 
+
+	private boolean verificaRelacao(String relacao){
+		final String RELACAO = "/"+Constantes.RELACOES+"/";
+
+		return relacao.startsWith(RELACAO);
+	}
 
 
 	public void verificaElementosExclusivos(Set<ArestaConceptNet> atual, Set<ArestaConceptNet> comparada){

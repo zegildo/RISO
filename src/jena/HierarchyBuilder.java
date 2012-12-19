@@ -1,31 +1,11 @@
-
-/*****************************************************************************
- * Source code information
- * -----------------------
- * Original author    Ian Dickinson, HP Labs Bristol
- * Author email       Ian.Dickinson@hp.com
- * Package            Jena 2
- * Web                http://sourceforge.net/projects/jena/
- * Created            27-Mar-2003
- * Filename           $RCSfile: ClassHierarchy.java.html,v $
- * Revision           $Revision: 1.4 $
- * Release status     $State: Exp $
- *
- * Last modified on   $Date: 2007/01/17 10:44:18 $
- *               by   $Author: andy_seaborne $
- *
- * (c) Copyright 2002, 2003, 2004, 2005, 2006, 2007 Hewlett-Packard Development Company, LP
- * (see footer for full conditions)
- *****************************************************************************/
-
-// Package
-///////////////
 package jena;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import riso.builder.conceptNet5.URI.Constantes;
 
@@ -66,7 +46,8 @@ public class HierarchyBuilder {
 		List<List<String>> vetores = new ArrayList<List<String>>();
 		while (i.hasNext()) {
 			List<String> vetor = new ArrayList<String>();
-			setVector(vetor,(OntClass) i.next(), new ArrayList<OntClass>());
+			OntClass raiz = i.next();
+			setVector(vetor,(OntClass) raiz, new ArrayList<OntClass>());
 			vetores.add(vetor);
 		}
 
@@ -78,9 +59,31 @@ public class HierarchyBuilder {
 
 		if (cls.canAs( OntClass.class )  &&  !occurs.contains( cls )) {
 			String elemento = cls.getURI();
-			int posicao = elemento.lastIndexOf("/");
-			elemento = elemento.substring(posicao+1, elemento.length());
-			vetor.add(elemento);
+			int posicaoEN = elemento.lastIndexOf("/en/")+4;
+			int posicaoN = elemento.lastIndexOf("/n/");
+			int posicaoA = elemento.lastIndexOf("/a/");
+			int posicaoV = elemento.lastIndexOf("/v/");
+
+			if(posicaoN > 0){
+				String desamb = elemento.substring(posicaoN+3, elemento.length());
+				elemento = elemento.substring(posicaoEN, posicaoN);
+				elemento +="("+desamb+")";
+			}else if(posicaoV > 0){
+				String desamb = elemento.substring(posicaoV+3, elemento.length());
+				elemento = elemento.substring(posicaoEN, posicaoV);
+				elemento +="("+desamb+")";
+			}else if(posicaoA > 0){
+				String desamb = elemento.substring(posicaoA+3, elemento.length());
+				elemento = elemento.substring(posicaoEN, posicaoA);
+				elemento +="("+desamb+")";
+			}else{
+				elemento = elemento.substring(posicaoEN, elemento.length());
+			}
+			elemento = elemento.replaceAll("_", " ");
+
+			if(!vetor.contains(elemento)){
+				vetor.add(elemento);
+			}
 			for (@SuppressWarnings("rawtypes")
 			Iterator i = cls.listSubClasses( true );  i.hasNext(); ) {
 				OntClass sub = (OntClass) i.next();
@@ -108,7 +111,7 @@ public class HierarchyBuilder {
 		return getModel();
 	}
 
-	
+
 
 	private void buildMinimalGraph(OntModel model, OntClass superior, OntClass cls, List<OntClass> occurs, int depth) {
 		buildGraph(model,superior,cls);
@@ -154,7 +157,7 @@ public class HierarchyBuilder {
 		}
 		return false;
 	}
-	
+
 	private boolean verificaRelacaoTransitiva(String relacao){
 		for (String rel : Constantes.RELACOES_TRANSITIVAS) {
 			if(relacao.contains(rel)){
@@ -162,6 +165,34 @@ public class HierarchyBuilder {
 			}
 		}
 		return false;
+	}
+
+
+	public static void main(String args[]){
+
+		String elemento = "http://lsi.dsc.ufcg.edu.br/riso.owl#/c/en/male_bond/a/";
+		int posicaoEN = elemento.lastIndexOf("/en/")+4;
+		int posicaoN = elemento.lastIndexOf("/n/");
+		int posicaoA = elemento.lastIndexOf("/a/");
+		int posicaoV = elemento.lastIndexOf("/v/");
+
+		if(posicaoN > 0){
+			String desamb = elemento.substring(posicaoN+3, elemento.length());
+			elemento = elemento.substring(posicaoEN, posicaoN);
+			elemento +="("+desamb+")";
+		}else if(posicaoV > 0){
+			String desamb = elemento.substring(posicaoV+3, elemento.length());
+			elemento = elemento.substring(posicaoEN, posicaoV);
+			elemento +="("+desamb+")";
+		}else if(posicaoA > 0){
+			String desamb = elemento.substring(posicaoA+3, elemento.length());
+			elemento = elemento.substring(posicaoEN, posicaoA);
+			elemento +="("+desamb+")";
+		}else{
+			elemento = elemento.substring(posicaoEN, elemento.length());
+		}
+		elemento = elemento.replaceAll("_", " ");
+		System.out.println(elemento);
 	}
 }
 

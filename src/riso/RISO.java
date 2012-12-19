@@ -3,39 +3,57 @@ package riso;
 import java.util.Iterator;
 import java.util.List;
 
+import jena.VetorTematico;
 import riso.builder.conceptNet5.URI.out.ConceitoExpandido;
 import riso.builder.conceptNet5.URI.out.FiltroDeResultados;
 import riso.builder.documents.Biblioteca;
+import riso.builder.documents.Desambiguador;
 import riso.builder.documents.Documento;
+import riso.builder.topicMap.OntoMaker;
 import riso.db.biblioteca.BibliotecaDAO;
+import riso.db.vetoresTematicos.VetorTematicoDAO;
 
 public class RISO {
 	
 	public static void main(String args[]){
 		
-		ConceitoExpandido conceitoExp = new ConceitoExpandido();
+		
 		Biblioteca biblioteca = new Biblioteca();
+
 		List<Documento> documentos = biblioteca.constroiDocumentos();
 		
 		BibliotecaDAO bibDAO = new BibliotecaDAO(documentos);
-		bibDAO.salvarDocumentos();
-		
 		Iterator<Documento> it = documentos.iterator();
 		
 		while(it.hasNext()){
 			
 			Documento doc = it.next();
 			String palavrasMarcadas = doc.getPalavrasMarcadas();
-			String conceitos[] = palavrasMarcadas.split(",");
 			
-			for (String conceito : conceitos) {
-				//verificar se a palavra ja foi enriquecida...
-				//caso contrario...
-				conceitoExp.enriqueceConceito(FiltroDeResultados.SEARCH_TEXT,"&",conceito);
+			if(!palavrasMarcadas.isEmpty()){
+				bibDAO.salvaDocumento(doc);
+				String conceitos[] = palavrasMarcadas.split(",");
 				
-				//comparar paragrafo do conceito com vetores tematicos do conceito
-				//indexar documento com o conceito
-			}	
+				for (String conceito : conceitos) {
+					VetorTematicoDAO vetorDAO = new VetorTematicoDAO();
+					List<VetorTematico> vetores = vetorDAO.obtemVetoresTematicos(conceito);
+					
+					if(vetores.isEmpty()){
+						ConceitoExpandido conceitoExp = new ConceitoExpandido(conceito);
+						conceitoExp.enriqueceConceito(FiltroDeResultados.SEARCH_TEXT,"&");
+						vetores = vetorDAO.obtemVetoresTematicos(conceito);
+					}
+	
+					Desambiguador desambiguador = new Desambiguador(doc, vetores);
+					desambiguador.calculaVetorTermos(conceito);
+					VetorTematico vetor = desambiguador.getVetorTematico().get(0);
+					
+					OntoMaker onto = new OntoMaker();
+					onto.indexaDocumento(doc, conceito, vetor);
+					
+				}	
+			}
+			
 			
 		}
 		

@@ -1,89 +1,70 @@
 package riso.builder.documents;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import jena.VetorTematico;
+
 
 public class Desambiguador {
 
-	private String[] paragrafo;
-	private String[] vetorTematico;
-	private String conceito;
-	private String sentido;
-	private double valor;
-	
-	
-	public Desambiguador(String[] paragrafo, String conceito, String[] vetorTematico, String sentido ){
-		setParagrafo(paragrafo);
-		setVetorTematico(vetorTematico);
-		setConceito(conceito);
-		setSentido(sentido);
-		setValor(paragrafo,vetorTematico);
+	private Documento documento;
+	private List<VetorTematico> vetorTematico = new ArrayList<VetorTematico>();
+
+
+	public Desambiguador(Documento documento, List<VetorTematico> vetoresTematicos){
+		setDocumento(documento);
+		setVetorTematico(vetoresTematicos);
 	}
-	
-	private double calculaVetorTermos(String[] paragrafo, String[] vetorTematico){
-		
-		double mach = 0;
-		for (String palavra : paragrafo) {
-				for (String termo : vetorTematico) {
-					if(palavra.equals(termo)){
+
+	public void calculaVetorTermos(String conceitoDaVez){
+
+		int mach = 0;
+
+		String palavrasDocumento[] = getDocumento().getVetorParagrafo().split(",");
+
+		for (VetorTematico vetor : getVetorTematico()) {
+
+			List<String> vetorEnriquecido = vetor.getVetor();
+
+			for (String elemento: vetorEnriquecido) {
+				
+				for (String palavra : palavrasDocumento) {
+										
+					if(!palavra.equalsIgnoreCase(conceitoDaVez) && (elemento.contains(palavra)||(palavra.contains(elemento)))){
 						mach++;
 					}
 				}
+			}
+			vetor.setDesambiguador(mach);
+			mach = 0;
 		}
-		return mach;
+		Collections.sort(getVetorTematico());
+		setVetorTematico(getVetorTematico());
+
 	}
 
-
-	public String[] getParagrafo() {
-		return paragrafo;
+	public Documento getDocumento() {
+		return documento;
 	}
 
-
-	public void setParagrafo(String[] paragrafo) {
-		this.paragrafo = paragrafo;
+	public void setDocumento(Documento documento) {
+		this.documento = documento;
 	}
 
-
-	public String[] getVetorTematico() {
+	public List<VetorTematico> getVetorTematico() {
 		return vetorTematico;
 	}
 
-
-	public void setVetorTematico(String[] vetorTematico) {
+	public void setVetorTematico(List<VetorTematico> vetorTematico) {
 		this.vetorTematico = vetorTematico;
+
+		for (VetorTematico vt : vetorTematico) {
+
+			System.out.println(vt.getDesambiguador()+":"+vt.getVetor());
+
+		}
 	}
 
-
-	public String getConceito() {
-		return conceito;
-	}
-
-
-	public void setConceito(String conceito) {
-		this.conceito = conceito;
-	}
-
-
-	public String getSentido() {
-		return sentido;
-	}
-
-
-	public void setSentido(String sentido) {
-		this.sentido = sentido;
-	}
-
-
-	public double getValor() {
-		return valor;
-	}
-
-
-	public void setValor(double valor) {
-		this.valor = valor;
-	}
-	
-	public void setValor(String[] paragrafo, String[] vetorTematico) {
-		double valor = calculaVetorTermos(paragrafo, vetorTematico);
-		setValor(valor);
-	}
-	
 }

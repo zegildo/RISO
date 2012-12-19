@@ -1,78 +1,17 @@
 package riso.builder.conceptNet5.URI.out;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
-import jena.HierarchyBuilder;
-import jena.VetorTematico;
-import riso.db.RisoDAO;
-
-import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import riso.builder.topicMap.OntoMaker;
 
 public class ConceitoExpandido {
 
-	private final int PAIS = 0;
-	private final String BASE ="http://lsi.dsc.ufcg.edu.br/riso.owl#";
-
 	private String conceito;
-	private OntModel baseMinimal =  ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-	private OntModel baseVetorTematico =  ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-	private OntModel modeloMinimal =  ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-	private RisoDAO risoDAO = new RisoDAO();
 
-	public RisoDAO getRisoDAO() {
-		return risoDAO;
-	}
-
-	public void setRisoDAO(RisoDAO risoDAO) {
-		this.risoDAO = risoDAO;
-	}
-
-	private List<VetorTematico> vetoresTematicos = new ArrayList<VetorTematico>();
-
-	public List<VetorTematico> getVetoresTematicos() {
-		return vetoresTematicos;
-	}
-
-	public void setVetoresTematicos(List<VetorTematico> vetoresTematicos) {
-		this.vetoresTematicos = vetoresTematicos;
-	}
-
-	public OntModel getBaseMinimal() {
-		return baseMinimal;
-	}
-
-	public void setBaseMinimal(OntModel baseMinimal) {
-		this.baseMinimal = baseMinimal;
-	}
-
-	public OntModel getBaseVetorTematico() {
-		return baseVetorTematico;
-	}
-
-	public void setBaseVetorTematico(OntModel baseVetorTematico) {
-		this.baseVetorTematico = baseVetorTematico;
-	}
-
-	//OK
-	public void enriqueceConceito(String fonte, String caracter, String conceito){
-
+	public ConceitoExpandido(String conceito){		
 		setConceito(conceito);
-		FiltroDeResultados filtro = new FiltroDeResultados();
-		List<Set<ArestaConceptNet>> paisEFilhos = filtro.eliminarConceitosFracamenteRelacionados(fonte, caracter,conceito);
-		Set<ArestaConceptNet> pais = paisEFilhos.get(PAIS);
-		Set<ArestaConceptNet> afirmacoes = filtro.getAfirmacoes(pais);
-		parentescoPorFilho(afirmacoes, conceito);
-
 	}
-
+	
 	public String getConceito() {
 		return conceito;
 	}
@@ -81,81 +20,32 @@ public class ConceitoExpandido {
 		this.conceito = conceito;
 	}
 
-	private void adicionaAfirmacao(ArestaConceptNet afirmacao){
+	public void enriqueceConceito(String fonte, String caracter){
 
-		String s = BASE+afirmacao.getStart().trim();
-		String p = afirmacao.getRel().trim();
-		String o = BASE+afirmacao.getEnd().trim();
+		FiltroDeResultados filtro = new FiltroDeResultados();
+		Set<ArestaConceptNet> afirmacoesUteis = filtro.eliminarAfirmacoesInuteis(fonte, caracter,getConceito());
+		Set<ArestaConceptNet> afirmacoes = filtro.obtemAfirmacoesOcultas(afirmacoesUteis);
+		parentescoPorFilho(afirmacoes, getConceito());
 
-		OntClass suj = getBaseMinimal().createClass(s+" "+p);
-		OntClass obj = getBaseMinimal().createClass(o+" "+p);
-		suj.addSuperClass(obj);
-
-		OntClass sujeito = getBaseVetorTematico().createClass(s);
-		OntClass objeto = getBaseVetorTematico().createClass(o);
-		sujeito.addSuperClass(objeto);
-	}
-
-
-	private void criaGrafoMinimal(OntModel modeloMinimal){
-		modeloMinimal.setNsPrefix("base", BASE);
-		try{
-			FileOutputStream outInicio = new FileOutputStream(new File("ontoInicio.txt"));
-			FileOutputStream outMinimal = new FileOutputStream(new File("ontoMinimal.txt"));
-
-			modeloMinimal.write(outInicio);
-			HierarchyBuilder hierarquia = new HierarchyBuilder();
-			OntModel grafoMinimo = hierarquia.getMinimalGraph(modeloMinimal);
-			setModeloMinimal(grafoMinimo);
-			grafoMinimo.write(outMinimal);
-
-			getRisoDAO().criaGrafoNomeado(grafoMinimo);
-
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-	}
-
-	private void criaVetorTematico(OntModel modeloVetorTematico, String conceito){
-		HierarchyBuilder hierarquia = new HierarchyBuilder();
-		List<List<String>> vetorTematico = hierarquia.getTematicVectores(getBaseVetorTematico());
-		List<VetorTematico> vetoresTematicos = new ArrayList<VetorTematico>();
-		for (List<String> list : vetorTematico) {
-			vetoresTematicos.add(new VetorTematico(list,conceito));
-		}
-		setVetoresTematicos(vetoresTematicos);
-		getRisoDAO().salvarVetores(vetoresTematicos);
-
-		for (VetorTematico vetor: getVetoresTematicos()) {
-			System.out.println(vetor.toString());
-		}
 	}
 
 	private void parentescoPorFilho(Set<ArestaConceptNet> afirmacoes, String conceito){
 
+		OntoMaker onto =  new OntoMaker();
 		for (ArestaConceptNet afirmacao : afirmacoes) {
 
-			adicionaAfirmacao(afirmacao);
+			onto.adicionaAfirmacao(afirmacao);
 		}
-
-		criaGrafoMinimal(getBaseMinimal());
-		criaVetorTematico(getBaseVetorTematico(), conceito);
+		
+		onto.criaGrafoMinimal(conceito);
+		onto.criaVetorTematico(conceito);
 	}
 
-	public OntModel getModeloMinimal() {
-		return modeloMinimal;
-	}
-
-	public void setModeloMinimal(OntModel modeloMinimal) {
-		this.modeloMinimal = modeloMinimal;
-	}
-
+	
 	public static void main(String args[]){
 
-
-
-		String conceito = "jaguar";
-		ConceitoExpandido t = new ConceitoExpandido();
+		//String conceito = "jaguar";
+		//ConceitoExpandido t = new ConceitoExpandido();
 		//
 		//
 		//		Nodo jaguar = new Nodo("/c/en/jaguar");
@@ -184,7 +74,7 @@ public class ConceitoExpandido {
 		//		t.constroiRelacoes(jaguar, mamifero);
 		//		t.constroiRelacoes(mamifero,animal);
 		//		t.constroiRelacoes(jaguar, mamifero);
-		t.enriqueceConceito(FiltroDeResultados.SEARCH_TEXT,"&",conceito);
+		//t.enriqueceConceito(FiltroDeResultados.SEARCH_TEXT,"&",conceito);
 
 		/*Aresta aresta = prepara(searchText+"jaguar&limit="+Constantes.ZERO);
 		System.out.println("O que deve ser: "+aresta.getNumFound());

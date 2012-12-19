@@ -110,10 +110,10 @@ public final class UsuarioWordNet {
 	//
 	//	}
 
-	public boolean verificaRelacao(String termoDaVez, String relacao, String termo){
+	public boolean verificaRelacao(String relacao){
 		final String RELACAO = "/"+Constantes.RELACOES+"/";
 
-		return (!termoDaVez.equals(termo) && (relacao.startsWith(RELACAO)));
+		return relacao.startsWith(RELACAO);
 //		if(termoDaVez.startsWith(termo+ESPACO)){
 //			return true;
 //			

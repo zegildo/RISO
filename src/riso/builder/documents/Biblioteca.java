@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import riso.builder.conceptNet5.URI.Constantes;
+
 
 public class Biblioteca {
 
@@ -76,13 +78,26 @@ public class Biblioteca {
 		String vetor = "";
 		texto = texto.replaceAll(EXPRESSAO_TOKENS, "");
 		String palavras[] = texto.split(" ");
-		for (String str : palavras) {
-			vetor += str+",";
+		if(palavras.length > 0){	
+			for (String str : palavras) {
+				if(!isStopWord(str)){
+					vetor += str+",";
+				}
+			}
 		}
 		if(vetor.length() > 0){
 			vetor = vetor.substring(0, vetor.length()-1);
 		}
 		return vetor;
+	}
+	
+	private boolean isStopWord(String str){
+		for (String stop : Constantes.STOP_WORDS) {
+			if(str.equalsIgnoreCase(stop)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public List<Documento> constroiDocumentos(){

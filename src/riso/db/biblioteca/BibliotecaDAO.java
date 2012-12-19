@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
+import java.sql.Statement;
 import java.util.List;
 
 import riso.builder.documents.Documento;
@@ -51,29 +51,24 @@ public class BibliotecaDAO {
 		return doc;  
 	}  
 
-	public void salvarDocumentos(){  
+	public void salvaDocumento(Documento doc){  
 
-		PreparedStatement stm = null;
+		Statement stm = null;
 		try{
-			stm = (PreparedStatement) DBConexion.getInstance().getConnection().createStatement();
-			Iterator<Documento> it = getListaDeDocumentos().iterator();
-			
-			while(it.hasNext()){  
-				Documento doc = it.next();
-				String palavrasMarcadas = doc.getPalavrasMarcadas();
-				String vetorParagrafo = doc.getVetorParagrafo();
-				String nomeArquivo = doc.getNomeArquivo();
-				String query = "INSERT INTO vectors VALUES ('"+palavrasMarcadas+"','"+vetorParagrafo+",'"+nomeArquivo+"')";  
-				stm.addBatch(query); 
-			}  
-			stm.executeBatch(); 
+			stm = DBConexion.getInstance().getConnection().createStatement();
+
+			String palavrasMarcadas = doc.getPalavrasMarcadas();
+			String vetorParagrafo = doc.getVetorParagrafo();
+			String nomeArquivo = doc.getNomeArquivo();
+			String sql = "INSERT INTO documentos VALUES ('"+palavrasMarcadas+"','"+vetorParagrafo+"','"+nomeArquivo+"')";  
+			stm.execute(sql);
 
 		}catch(SQLException e){
-		  e.printStackTrace();
+			e.printStackTrace();
 		}finally{
 			DBConexion.closeStatement(stm);  
 		}
 
-	}   
+	} 
 
 }

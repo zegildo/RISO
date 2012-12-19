@@ -1,19 +1,30 @@
 package jena;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
-public class VetorTematico {
+public class VetorTematico implements Comparable<VetorTematico> {
 
-	private Set<String> vetor = new HashSet<String>();
+	private List<String> vetor;
 	private String conceito;
+	private double desambiguador;
 
 	public VetorTematico(List<String> vetor, String conceito) {
 		setVetor(vetor);
 		setConceito(conceito);
+	}
+
+	public double getDesambiguador() {
+		return desambiguador;
+	}
+
+	public void setDesambiguador(double desambiguador) {
+		this.desambiguador = desambiguador;
+	}
+
+	public void setVetor(List<String> vetor) {
+		this.vetor = vetor;
 	}
 
 	public VetorTematico(String vetor, String conceito) {
@@ -27,6 +38,7 @@ public class VetorTematico {
 		}
 
 		setVetor(vector);
+		setConceito(conceito);
 	}
 
 	public String getConceito() {
@@ -37,12 +49,8 @@ public class VetorTematico {
 		this.conceito = conceito;
 	}
 
-	public Set<String> getVetor() {
+	public List<String> getVetor() {
 		return vetor;
-	}
-
-	public void setVetor(List<String> vetor) {
-		this.vetor = new HashSet<String>(vetor);
 	}
 
 	public String toString(){
@@ -54,6 +62,16 @@ public class VetorTematico {
 		}
 		geral = geral.substring(0, geral.length()-1)+"]";
 		return geral;
+	}
+	
+	public int compareTo(VetorTematico o) {
+		
+		if(o.getDesambiguador() == getDesambiguador()){
+			return 0;
+		}else if(o.getDesambiguador() > getDesambiguador()){
+			return 1;
+		}
+		return -1;
 	}
 
 	public static void main(String args[]){

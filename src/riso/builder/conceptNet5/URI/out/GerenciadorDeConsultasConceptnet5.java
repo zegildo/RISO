@@ -39,8 +39,8 @@ public class GerenciadorDeConsultasConceptnet5 {
 
 	public Aresta gerenciaSolicitacoes(String fonte, String caracter, String conceito){
 
-		String uriFinal = fonte+conceito+caracter+Constantes.LIMIT+Constantes.ZERO;
-		Aresta aresta = consultaConceptnet5(uriFinal);
+		String uriFinal = fonte+conceito+caracter+Constantes.LIMIT;
+		Aresta aresta = consultaConceptnet5(uriFinal+Constantes.ZERO);
 		Aresta arestaAux = null;
 		if(aresta.getNumFound() > JANELA){
 			int qtIt = aresta.getNumFound() / JANELA;

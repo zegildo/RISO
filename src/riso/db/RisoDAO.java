@@ -34,7 +34,7 @@ public class RisoDAO {
 		return getVetorDAO().obtemVetoresTematicos(conceito);
 	}
 	
-	public void criaGrafoNomeado(Model grafo){
+	public void insereGrafoNomeado(Model grafo){
 		getTopicDAO().criaGrafoNomeado(grafo);
 	}
 	
