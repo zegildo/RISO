@@ -6,6 +6,7 @@ import jena.VetorTematico;
 import riso.db.topicMap.TopicMapDAO;
 import riso.db.vetoresTematicos.VetorTematicoDAO;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 
 public class RisoDAO {
@@ -34,8 +35,8 @@ public class RisoDAO {
 		return getVetorDAO().obtemVetoresTematicos(conceito);
 	}
 	
-	public void insereGrafoNomeado(Model grafo){
-		getTopicDAO().criaGrafoNomeado(grafo);
+	public void insereGrafoNomeado(OntModel grafo){
+		getTopicDAO().addGrafoNomeado(grafo);
 	}
 	
 	public Model recuperaModeloNomeado(){

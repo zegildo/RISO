@@ -1,6 +1,7 @@
 package riso.builder.topicMap;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import jena.HierarchyBuilder;
 import jena.VetorTematico;
 import riso.builder.conceptNet5.URI.out.ArestaConceptNet;
+import riso.builder.conceptNet5.URI.out.Topico;
 import riso.builder.documents.Documento;
 import riso.db.RisoDAO;
 
@@ -16,10 +18,8 @@ import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class OntoMaker {
 
@@ -27,7 +27,9 @@ public class OntoMaker {
 	private OntModel baseVetorTematico =  ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 	private OntModel modeloMinimal =  ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 	private final String BASE ="http://lsi.dsc.ufcg.edu.br/riso.owl#";
+	private final String RELACOES = "http://lsi.dsc.ufcg.edu.br/riso.owl#/r/";
 	private RisoDAO risoDAO = new RisoDAO();
+	private final String HAS_CONTEXT = "hasContext";
 	private List<VetorTematico> vetoresTematicos = new ArrayList<VetorTematico>();
 
 	public List<VetorTematico> getVetoresTematicos() {
@@ -85,17 +87,36 @@ public class OntoMaker {
 		sujeito.addSuperClass(objeto);
 	}
 
+	private void adicionaContexto(String conceito, OntModel mini){
+		
+		OntModel minimal = getModeloMinimal();
+		String classe = BASE+"/c/en/"+conceito+"@CONTEXT";
+		OntClass contexto = minimal.createClass(classe);
+		OntProperty propHasContext = minimal.createOntProperty(RELACOES+HAS_CONTEXT);
+
+		for (VetorTematico vetor : getVetoresTematicos()) {
+			Topico topico = vetor.getVetor().get(0);
+			String uri = topico.getUri();
+			OntClass conc = minimal.getOntClass(uri);
+			contexto.addProperty(propHasContext, conc);
+		}
+		setModeloMinimal(minimal);
+	}
+
 	public void criaGrafoMinimal(String conceito){
 		getBaseMinimal().setNsPrefix("base", BASE);
 		try{
 			FileOutputStream outInicio = new FileOutputStream(new File("reuters/results/"+conceito+"_ontoInicio.txt"));
 			FileOutputStream outMinimal = new FileOutputStream(new File("reuters/results/"+conceito+"_ontoMinimal.txt"));
 
+			OntModel minimal = getBaseMinimal();
 			getBaseMinimal().write(outInicio);
 			HierarchyBuilder hierarquia = new HierarchyBuilder();
-			OntModel grafoMinimo = hierarquia.getMinimalGraph(getBaseMinimal());
+			OntModel grafoMinimo = hierarquia.getMinimalGraph(minimal);
 			setModeloMinimal(grafoMinimo);
-			grafoMinimo.write(outMinimal);
+			adicionaContexto(conceito, grafoMinimo);
+			getRisoDAO().insereGrafoNomeado(getModeloMinimal());
+			getModeloMinimal().write(outMinimal);
 
 		}catch(IOException e){
 			e.printStackTrace();
@@ -104,48 +125,57 @@ public class OntoMaker {
 
 	public void criaVetorTematico(String conceito){
 		HierarchyBuilder hierarquia = new HierarchyBuilder();
-		List<List<String>> vetorTematico = hierarquia.getTematicVectores(getBaseVetorTematico());
+		List<List<Topico>> vetorTematico = hierarquia.getTematicVectores(getBaseVetorTematico());
 		List<VetorTematico> vetoresTematicos = new ArrayList<VetorTematico>();
-		for (List<String> list : vetorTematico) {
+		for (List<Topico> list : vetorTematico) {
 			vetoresTematicos.add(new VetorTematico(list,conceito));
 		}
 		setVetoresTematicos(vetoresTematicos);
+
 		getRisoDAO().salvarVetores(vetoresTematicos);
 	}
 
-	public void indexaDocumento(Documento doc, String texto, VetorTematico vetor){
+	
+	private String documentoSemExtensao(String nomeArquivo){
+		
+		return nomeArquivo.substring(0, nomeArquivo.indexOf(".")).trim();
+		
+	}
+	public void indexaDocumento(Documento doc, String texto, Topico topico){
 
-		String conceito = null;
-		final RDFNode rdf = null;
 		final String HAS_TEXT = "hasText";
-		final String HAS_CONTEXT = "hasContext";
-		OntModel indexador =  ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 
-		String documento = BASE+doc.getNomeArquivo().trim();
+		String documento = BASE+"/"+doc.getNomeArquivo().trim();
+
+		Model informacaoAtual = getRisoDAO().recuperaModeloNomeado();
+		OntModelSpec spec = new OntModelSpec( OntModelSpec.OWL_MEM );
+		OntModel indexador = ModelFactory.createOntologyModel(spec, informacaoAtual);
+		
+
 		OntClass sujDocument = indexador.createClass(documento);
-		OntProperty propHasText = indexador.createOntProperty(HAS_TEXT);
-		OntProperty propHasContext = indexador.createOntProperty(HAS_CONTEXT);
+		OntProperty propHasText = indexador.createOntProperty(RELACOES+HAS_TEXT);
+		OntProperty propHasContext = indexador.createOntProperty(RELACOES+HAS_CONTEXT);
 
-		OntClass conceitoTexto = getModeloMinimal().getOntClass(BASE+"/c/en/"+texto);
-		//TODO verificar se de fato o vetor tematico que mais se assemelha do texto possui
-		//o conceito mais proximo do conceito citado
-		StmtIterator it =  getModeloMinimal().listStatements(conceitoTexto, null, rdf);
 
-		while(it.hasNext()){
-			Statement afirm = it.next();
-			for (String str : vetor.getVetor()) {
-				if(str.equalsIgnoreCase(afirm.getObject().toString())){
-					conceito = str;	
-				}
-			}
+		OntClass contextoTexto = indexador.getOntClass(topico.getUri());
+		texto = BASE+"/@"+texto;
+		
+		sujDocument.addProperty(propHasText, texto);
+		sujDocument.addProperty(propHasContext, contextoTexto);	
+
+
+		FileOutputStream teste2;
+
+		try {
+			teste2 = new FileOutputStream(new File("reuters/results/teste2.txt"));
+			indexador.write(teste2);
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		sujDocument.addProperty(propHasText, texto);
-		sujDocument.addProperty(propHasContext, conceito);				
-
-		getModeloMinimal().add(indexador);
-
-		getRisoDAO().insereGrafoNomeado(getModeloMinimal());
+		getRisoDAO().insereGrafoNomeado(indexador);
 
 
 	}

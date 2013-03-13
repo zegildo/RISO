@@ -2,12 +2,11 @@ package jena;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import riso.builder.conceptNet5.URI.Constantes;
+import riso.builder.conceptNet5.URI.out.Topico;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -37,15 +36,15 @@ public class HierarchyBuilder {
 
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<List<String>> getTematicVectores(OntModel m) {
+	public List<List<Topico>> getTematicVectores(OntModel m) {
 		ExtendedIterator<OntClass> i = m.listHierarchyRootClasses()
 				.filterDrop( new Filter() {
 					public boolean accept( Object o ) {
 						return ((Resource) o).isAnon();
 					}} );
-		List<List<String>> vetores = new ArrayList<List<String>>();
+		List<List<Topico>> vetores = new ArrayList<List<Topico>>();
 		while (i.hasNext()) {
-			List<String> vetor = new ArrayList<String>();
+			List<Topico> vetor = new ArrayList<Topico>();
 			OntClass raiz = i.next();
 			setVector(vetor,(OntClass) raiz, new ArrayList<OntClass>());
 			vetores.add(vetor);
@@ -53,11 +52,31 @@ public class HierarchyBuilder {
 
 		return vetores;
 	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<String> getListContextos(OntModel m){
+		
+		ExtendedIterator<OntClass> i = m.listHierarchyRootClasses()
+				.filterDrop( new Filter() {
+					public boolean accept( Object o ) {
+						return ((Resource) o).isAnon();
+					}} );
+		
+		List<String> vetor = new ArrayList<String>();
+		while (i.hasNext()) {
+			OntClass no = i.next();
+			if(!no.listDeclaredProperties().hasNext()){
+				vetor.add(no.getURI());
+			}
+		}
+		return vetor;
+	}
 
 
-	private void setVector(List<String> vetor, OntClass cls, List<OntClass> occurs) {
+	private void setVector(List<Topico> vetor, OntClass cls, List<OntClass> occurs) {
 
 		if (cls.canAs( OntClass.class )  &&  !occurs.contains( cls )) {
+			String uri = cls.getURI();
 			String elemento = cls.getURI();
 			int posicaoEN = elemento.lastIndexOf("/en/")+4;
 			int posicaoN = elemento.lastIndexOf("/n/");
@@ -81,8 +100,9 @@ public class HierarchyBuilder {
 			}
 			elemento = elemento.replaceAll("_", " ");
 
-			if(!vetor.contains(elemento)){
-				vetor.add(elemento);
+			Topico topico = new Topico(uri,elemento);
+			if(!vetor.contains(topico)){
+				vetor.add(topico);
 			}
 			for (@SuppressWarnings("rawtypes")
 			Iterator i = cls.listSubClasses( true );  i.hasNext(); ) {

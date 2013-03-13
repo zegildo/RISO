@@ -59,5 +59,10 @@ public class GerenciadorDeConsultasConceptnet5 {
 		}
 		return aresta;
 	}
+	
+	public Aresta gerenciaSolicitacoesOnlyNumFound(String fonte, String caracter, String conceito){
+		String uriFinal = fonte+conceito+caracter+Constantes.LIMIT;
+		return consultaConceptnet5(uriFinal+Constantes.ZERO);
+	}
 
 }

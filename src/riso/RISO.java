@@ -6,6 +6,7 @@ import java.util.List;
 import jena.VetorTematico;
 import riso.builder.conceptNet5.URI.out.ConceitoExpandido;
 import riso.builder.conceptNet5.URI.out.FiltroDeResultados;
+import riso.builder.conceptNet5.URI.out.Topico;
 import riso.builder.documents.Biblioteca;
 import riso.builder.documents.Desambiguador;
 import riso.builder.documents.Documento;
@@ -16,7 +17,6 @@ import riso.db.vetoresTematicos.VetorTematicoDAO;
 public class RISO {
 	
 	public static void main(String args[]){
-		
 		
 		Biblioteca biblioteca = new Biblioteca();
 
@@ -31,7 +31,10 @@ public class RISO {
 			String palavrasMarcadas = doc.getPalavrasMarcadas();
 			
 			if(!palavrasMarcadas.isEmpty()){
-				bibDAO.salvaDocumento(doc);
+				boolean esseDocumentoExiste = bibDAO.verificaSeDocumentoExiste(doc);
+				if(!esseDocumentoExiste){
+					bibDAO.salvaDocumento(doc);
+				}
 				String conceitos[] = palavrasMarcadas.split(",");
 				
 				for (String conceito : conceitos) {
@@ -47,9 +50,10 @@ public class RISO {
 					Desambiguador desambiguador = new Desambiguador(doc, vetores);
 					desambiguador.calculaVetorTermos(conceito);
 					VetorTematico vetor = desambiguador.getVetorTematico().get(0);
+					Topico topico = vetor.getVetor().get(0);
 					
 					OntoMaker onto = new OntoMaker();
-					onto.indexaDocumento(doc, conceito, vetor);
+					onto.indexaDocumento(doc, conceito, topico);
 					
 				}	
 			}

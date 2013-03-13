@@ -3,14 +3,16 @@ package jena;
 import java.util.ArrayList;
 import java.util.List;
 
+import riso.builder.conceptNet5.URI.out.Topico;
+
 
 public class VetorTematico implements Comparable<VetorTematico> {
 
-	private List<String> vetor;
+	private List<Topico> vetor;
 	private String conceito;
 	private double desambiguador;
 
-	public VetorTematico(List<String> vetor, String conceito) {
+	public VetorTematico(List<Topico> vetor, String conceito) {
 		setVetor(vetor);
 		setConceito(conceito);
 	}
@@ -23,18 +25,18 @@ public class VetorTematico implements Comparable<VetorTematico> {
 		this.desambiguador = desambiguador;
 	}
 
-	public void setVetor(List<String> vetor) {
+	public void setVetor(List<Topico> vetor) {
 		this.vetor = vetor;
 	}
 
 	public VetorTematico(String vetor, String conceito) {
-		vetor = vetor.replace("[", "");
-		vetor = vetor.replace("]", "");
+		
 		String strings[] = vetor.split(",");
-		List<String> vector = new ArrayList<String>();
+		List<Topico> vector = new ArrayList<Topico>();
 
 		for (String string : strings) {
-			vector.add(string);
+			String partes[] = string.split("\\|");
+			vector.add(new Topico(partes[1].trim(), partes[0].trim()));
 		}
 
 		setVetor(vector);
@@ -49,18 +51,28 @@ public class VetorTematico implements Comparable<VetorTematico> {
 		this.conceito = conceito;
 	}
 
-	public List<String> getVetor() {
+	public List<Topico> getVetor() {
 		return vetor;
 	}
 
-	public String toString(){
+	public String toStringEspecial(){
 
 		String geral = "[";
 
-		for (String str : getVetor()) {
-			geral+=str+" ,";
+		for (Topico str : getVetor()) {
+			geral+=str.getConceito()+"|"+str.getUri()+",";
 		}
 		geral = geral.substring(0, geral.length()-1)+"]";
+		return geral;
+	}
+	
+	public String toString(){
+
+		String geral="";
+		for (Topico str : getVetor()) {
+			geral+=str.getConceito()+"|"+str.getUri()+",";
+		}
+		geral = geral.substring(0, geral.length()-1);
 		return geral;
 	}
 	

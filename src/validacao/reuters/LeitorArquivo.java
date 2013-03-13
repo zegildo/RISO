@@ -21,7 +21,7 @@ public class LeitorArquivo {
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(getNomeArquivo()));
 			while (in.ready()) {
-				listaDeTipos.add(in.readLine().trim());
+				listaDeTipos.add(new String(in.readLine().getBytes(), "UTF-8").trim());
 			}
 			in.close();
 		} catch (IOException e) {
@@ -31,7 +31,78 @@ public class LeitorArquivo {
 		setPalavras(listaDeTipos);
 	}
 	
+	public void geraPalavrasShiftadasdas() {
 
+		List<String> listaDeTipos = new ArrayList<String>();
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(getNomeArquivo()));
+			while (in.ready()) {
+				String termo = in.readLine();
+				String primeiroTermo = termo.split("\t")[0];
+				listaDeTipos.add(new String(primeiroTermo.getBytes(), "UTF-8").trim());
+			}
+			in.close();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		setPalavras(listaDeTipos);
+	}
+	
+	public void geraPalavrasEspaco() {
+
+		List<String> listaDeTipos = new ArrayList<String>();
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(getNomeArquivo()));
+			while (in.ready()) {
+				String termo = in.readLine();
+				String primeiroTermo = termo.split(" ")[0];
+				listaDeTipos.add(new String(primeiroTermo.getBytes(), "UTF-8").trim());
+			}
+			in.close();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		setPalavras(listaDeTipos);
+	}
+	
+	public void geraPalavrasParceadasBarra() {
+
+		List<String> listaDeTipos = new ArrayList<String>();
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(getNomeArquivo()));
+			while (in.ready()) {
+				String termo = in.readLine();
+				String primeiroTermo = termo.split("/")[0];
+				listaDeTipos.add(new String(primeiroTermo.getBytes(), "UTF-8").trim());
+			}
+			in.close();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		setPalavras(listaDeTipos);
+	}
+	
+	public void geraPalavrasParceadasDoisPontos() {
+
+		List<String> listaDeTipos = new ArrayList<String>();
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(getNomeArquivo()));
+			while (in.ready()) {
+				String termo = in.readLine();
+				String primeiroTermo = termo.split(":")[0];
+				listaDeTipos.add(new String(primeiroTermo.getBytes(), "UTF-8").trim());
+			}
+			in.close();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		setPalavras(listaDeTipos);
+	}
+	
 	public String getNomeArquivo() {
 		return nomeArquivo;
 	}
@@ -51,8 +122,8 @@ public class LeitorArquivo {
 	}
 
 	public static void main(String args[]){
-		LeitorArquivo leitor = new LeitorArquivo("reuters/all-people-strings.lc.txt");
-		leitor.geraPalavrasArquivo();
+		LeitorArquivo leitor = new LeitorArquivo("pos/part-of-speech.txt");
+		leitor.geraPalavrasShiftadasdas();
 		for (String str : leitor.getPalavras()) {
 			System.out.println(str);
 		}

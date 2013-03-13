@@ -1,5 +1,5 @@
 abdel-hadi-kandeel
-alfons�n
+alfonsín
 alhaji-abdul-ahmed
 alptemocin
 amato
@@ -13,6 +13,7 @@ balladur
 bangemann
 barreto
 berge
+bermúdez
 beteta
 blix
 boesky
@@ -111,7 +112,7 @@ johnston
 kaminsky
 kaufman
 keating
-khameini
+khameni
 khomeini
 kiechle
 king-fahd
@@ -126,7 +127,7 @@ languetin
 lawson
 lee-ta-hai
 lee-teng-hui
-leenanon
+lennon
 leigh-pemberton
 leitz
 li-peng
@@ -138,7 +139,7 @@ lyng
 machinea
 macsharry
 malhotra
-mancera-aguayo
+mancera
 martens
 martin
 masse
@@ -146,7 +147,7 @@ maxwell
 maystadt
 medgyessy
 messner
-mikulic
+mikulić
 milliet
 mitterrand
 miyazawa
@@ -156,7 +157,6 @@ mohammad-yasin-khan-wattoo
 mohammed-ahmed-al-razaz
 mohammed-ali-abal-khail
 mohammed-salaheddin-hamid
-morales-bermudez
 mousavi
 moyle
 mubarak
@@ -167,20 +167,20 @@ nakao
 nakasone
 nasko
 nemeth
-nobrega
+nóbrega
 o-cofaigh
 o-kennedy
 oeien
-okongwu
+okonkwo
 ongpin
 ortega
-ozal
+özal
 palsson
 pandolfi
 papandreou
 parkinson
 paye
-perez-de-cuellar
+pérez-de-cuéllar
 petricioli
 pickens
 poehl
@@ -207,7 +207,7 @@ saberbein
 salinas
 samojlik
 santer
-saracoglu
+saracoğlu
 sarney
 sartzetakis
 sathe
@@ -226,7 +226,7 @@ steeg
 stich
 stoltenberg
 stoph
-strougal
+štrougal
 subroto
 suharto
 sumita
@@ -241,11 +241,11 @@ tiwari
 toernaes
 toman
 tsovolas
-vancsa
+váncsa
 venkataraman
 vera-la-rosa
 verity
-villanyi
+villányi
 vlatkovic
 volcker
 von-weizsaecker

@@ -280,6 +280,12 @@ public class FiltroDeResultados {
 
 	}
 
+	public int qtRecursos(String fonte, String caracter, String termo){
+		Aresta aresta = getGerenciador().gerenciaSolicitacoesOnlyNumFound(fonte, caracter, termo);
+		return aresta.getNumFound();
+
+	}
+
 	public Set<ArestaConceptNet> eliminarAfirmacoesInuteis(String fonte, String caracter, String termo){
 
 		Set<ArestaConceptNet> afirmacoesUteis = new HashSet<ArestaConceptNet>();

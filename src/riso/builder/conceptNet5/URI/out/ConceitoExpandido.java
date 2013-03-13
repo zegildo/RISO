@@ -11,7 +11,7 @@ public class ConceitoExpandido {
 	public ConceitoExpandido(String conceito){		
 		setConceito(conceito);
 	}
-	
+
 	public String getConceito() {
 		return conceito;
 	}
@@ -29,6 +29,20 @@ public class ConceitoExpandido {
 
 	}
 
+	public int getQtafirmacoesUteis(String fonte, String caracter){
+
+		FiltroDeResultados filtro = new FiltroDeResultados();
+		return filtro.qtRecursos(fonte, caracter,getConceito());
+
+	}
+
+	public int eliminaInformacoesInuteis(String fonte, String caracter){
+
+		FiltroDeResultados filtro = new FiltroDeResultados();
+		return filtro.eliminarAfirmacoesInuteis(fonte, caracter,getConceito()).size();
+
+	}
+
 	private void parentescoPorFilho(Set<ArestaConceptNet> afirmacoes, String conceito){
 
 		OntoMaker onto =  new OntoMaker();
@@ -37,11 +51,11 @@ public class ConceitoExpandido {
 			onto.adicionaAfirmacao(afirmacao);
 		}
 		
-		onto.criaGrafoMinimal(conceito);
 		onto.criaVetorTematico(conceito);
+		onto.criaGrafoMinimal(conceito);
 	}
 
-	
+
 	public static void main(String args[]){
 
 		//String conceito = "jaguar";

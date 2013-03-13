@@ -175,20 +175,20 @@ public class JenaOWL {
 		OntModel minimalGraph = h.getMinimalGraph(model);
 		minimalGraph.write(System.out);
 		
-		List<List<String>> grafo = h.getTematicVectores(m);
-
-		List<VetorTematico> vetoresTematicos = new ArrayList<VetorTematico>();
-		for (List<String> list : grafo) {
-			vetoresTematicos.add(new VetorTematico(list,"jaguar"));
-		}
+//		//List<List<String>> grafo = h.getTematicVectores(m);
+//
+//		List<VetorTematico> vetoresTematicos = new ArrayList<VetorTematico>();
+//		for (List<String> list : grafo) {
+//			vetoresTematicos.add(new VetorTematico(list,"jaguar"));
+//		}
 		
-		ConceitoExpandido conceito = new ConceitoExpandido("jaguar", vetoresTematicos, minimalGraph);
+	//	ConceitoExpandido conceito = new ConceitoExpandido("jaguar", vetoresTematicos, minimalGraph);
 		
-		List<VetorTematico> vetores = conceito.getVetoresTematicos();
-		
-		for (VetorTematico vT : vetores) {
-			System.out.println(vT);
-		}
+//		List<VetorTematico> vetores = conceito.getVetoresTematicos();
+//		
+//		for (VetorTematico vT : vetores) {
+//			System.out.println(vT);
+//		}
 
 	}
 }

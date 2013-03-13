@@ -38,9 +38,7 @@ public class BibliotecaDAO {
 			stm = con.prepareStatement("SELECT palavrasMarcadas, vetorParagrafo FROM documentos where nome = "+nomeDocumento);
 			rs = stm.executeQuery();  
 			doc = new Documento(rs.getString("palavrasMarcadas"),rs.getString("vetorParagrafo"),nomeDocumento);  
-
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		} finally {
 			DBConexion.closeResult(rs);  
@@ -51,15 +49,33 @@ public class BibliotecaDAO {
 		return doc;  
 	}  
 
+	public boolean verificaSeDocumentoExiste(Documento doc){  
+		
+		Connection con = null;
+		PreparedStatement stm = null;
+		ResultSet rs = null;
+		
+		try {
+			con = DBConexion.getInstance().getConnection();
+			stm = con.prepareStatement("SELECT 1 FROM documentos WHERE nomearquivo = '"+doc.getNomeArquivo()+"'");
+			rs = stm.executeQuery(); 
+			if(rs.next()){
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	public void salvaDocumento(Documento doc){  
 
 		Statement stm = null;
+		String palavrasMarcadas = doc.getPalavrasMarcadas();
+		String vetorParagrafo = doc.getVetorParagrafo();
+		String nomeArquivo = doc.getNomeArquivo();
 		try{
 			stm = DBConexion.getInstance().getConnection().createStatement();
-
-			String palavrasMarcadas = doc.getPalavrasMarcadas();
-			String vetorParagrafo = doc.getVetorParagrafo();
-			String nomeArquivo = doc.getNomeArquivo();
 			String sql = "INSERT INTO documentos VALUES ('"+palavrasMarcadas+"','"+vetorParagrafo+"','"+nomeArquivo+"')";  
 			stm.execute(sql);
 

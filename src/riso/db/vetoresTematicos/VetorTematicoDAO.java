@@ -1,5 +1,6 @@
 package riso.db.vetoresTematicos;
 
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,8 +24,9 @@ public class VetorTematicoDAO {
 			con = PostgresConnectionManager.getInstance().getConnection();
 			stm = con.prepareStatement("SELECT vetoresTematicos FROM termoEnriquecido WHERE termo = '"+termo+"'");
 			rs = stm.executeQuery();  
-			while(rs.next()){  
-				VetorTematico vetor = new VetorTematico(rs.getString("vetoresTematicos"),termo);  
+			while(rs.next()){
+				String vet = URLDecoder.decode(rs.getString("vetoresTematicos"),"UTF-8");
+				VetorTematico vetor = new VetorTematico(vet,termo);  
 				vetores.add(vetor);  
 			}  
 			

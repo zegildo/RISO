@@ -43,11 +43,11 @@ public class TopicMapDAO {
 		store.close() ;
 	}
 
-	public void criaGrafoNomeado(Model grafo){
+	public void addGrafoNomeado(Model grafo){
 
 		Store store = SDBFactory.connectStore(ARQUIVO_CONFIG);
 		Model model = SDBFactory.connectNamedModel(store, TOPIC_MAP) ;
-
+		
 		try{
 			model.begin();
 			model.add(grafo);

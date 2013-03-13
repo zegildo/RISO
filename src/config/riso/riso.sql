@@ -15,3 +15,9 @@ termo varchar(255),
 vetoresTematicos text,
 PRIMARY KEY(id)
 );
+
+create table topicos(
+termo varchar(255),
+topico varchar(255),
+PRIMARY KEY(termo,topico)
+);

@@ -9,10 +9,10 @@
 .
 <#conn> rdf:type sdb:SDBConnection ;
     sdb:sdbType        "postgresql" ;
-    sdb:sdbHost        "localhost:23456" ;
-    sdb:sdbName        "jena" ;
+    sdb:sdbHost        "localhost:5432" ;
+    sdb:sdbName        "jwnl" ;
     sdb:driver         "org.postgresql.Driver" ;
     sdb:sdbUser        "postgres" ;
-    sdb:sdbPassword    "postgres" ;
+    sdb:sdbPassword    "capacida" ;
     .
 

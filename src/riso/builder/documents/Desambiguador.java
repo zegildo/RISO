@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import riso.builder.conceptNet5.URI.out.Topico;
+
 import jena.VetorTematico;
 
 
@@ -26,13 +28,14 @@ public class Desambiguador {
 
 		for (VetorTematico vetor : getVetorTematico()) {
 
-			List<String> vetorEnriquecido = vetor.getVetor();
+			List<Topico> vetorEnriquecido = vetor.getVetor();
 
-			for (String elemento: vetorEnriquecido) {
+			for (Topico elemento: vetorEnriquecido) {
 				
 				for (String palavra : palavrasDocumento) {
-										
-					if(!palavra.equalsIgnoreCase(conceitoDaVez) && (elemento.contains(palavra)||(palavra.contains(elemento)))){
+					String el = elemento.getConceito();
+					
+					if(!palavra.equalsIgnoreCase(conceitoDaVez) && (el.contains(palavra)||(palavra.contains(el)))){
 						mach++;
 					}
 				}
